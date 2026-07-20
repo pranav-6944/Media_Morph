@@ -1,0 +1,28 @@
+# Node modules (both frontend & backend)
+node_modules/
+**/node_modules/
+
+# Build output
+frontend/dist/
+frontend/.vite/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Uploaded & converted media files (runtime data)
+backend/uploads/*
+backend/converted/*
+
+# Keep dirs but not contents
+!backend/uploads/.gitkeep
+!backend/converted/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

@@ -1,0 +1,28 @@
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+export const uploadFiles = (formData, onUploadProgress) => {
+  return axios.post(`${API_URL}/upload`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress
+  });
+};
+
+export const startConversion = (data) => {
+  return axios.post(`${API_URL}/convert`, data);
+};
+
+export const checkJobStatus = (jobId) => {
+  return axios.get(`${API_URL}/convert/status/${jobId}`);
+};
+
+export const downloadFileUrl = (filename) => {
+  return `${API_URL}/download/${filename}`;
+};
+
+export const downloadBatch = (filesData) => {
+  return axios.post(`${API_URL}/download/batch`, { files: filesData }, {
+    responseType: 'arraybuffer'
+  });
+};
