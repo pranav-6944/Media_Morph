@@ -1,98 +1,288 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { FolderArchive, Zap, Layers, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Zap, ShieldCheck, FolderArchive, ArrowRight,
+  FileImage, Layers, Clock, Globe
+} from 'lucide-react';
+import Navbar from './components/Navbar';
 import UploadBox from './components/UploadBox';
 import FileList from './components/FileList';
-import { uploadFiles, startConversion, checkJobStatus, downloadFileUrl, downloadBatch } from './api';
+import { uploadFiles, startConversion, checkJobStatus, downloadFileUrl, downloadBatch, deleteFile, API_URL } from './api';
+import { Routes, Route, Link } from 'react-router-dom';
+import Analytics from './pages/Analytics';
+import Legal from './pages/Legal';
+import CookieConsent from './components/CookieConsent';
 
-/* ── Star field generator ─────────────────────────────────────────────────── */
-function StarField({ count = 80 }) {
-  const stars = useRef(
-    Array.from({ length: count }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 2 + 0.5,
-      dur: (Math.random() * 3 + 2).toFixed(1),
-      delay: (Math.random() * 4).toFixed(1),
-    }))
-  ).current;
+/* ══════════════════════════════════════════════════════════════ */
+/*  Static sections                                               */
+/* ══════════════════════════════════════════════════════════════ */
 
+const FEATURES = [
+  {
+    Icon: Zap,
+    title: 'Instant Conversion',
+    desc: 'Server-side processing with FFmpeg and Sharp. No queues, no delays. Your files are converted the moment you submit.',
+  },
+  {
+    Icon: ShieldCheck,
+    title: 'Zero Cloud, Full Privacy',
+    desc: 'Everything runs on your machine. Your files never leave your server. No analytics, no tracking, no data retention.',
+  },
+  {
+    Icon: Globe,
+    title: '18+ Output Formats',
+    desc: 'From legacy BMP to cutting-edge AVIF. Convert images, video, and audio in one unified batch operation.',
+  },
+];
+
+const HOW_STEPS = [
+  { n: '01', title: 'Drop your files', desc: 'Drag & drop files or entire folders. Mix images, videos, and audio in one batch.' },
+  { n: '02', title: 'Choose format',   desc: 'Select the output format per file — or apply one format across the whole batch.' },
+  { n: '03', title: 'Convert & save',  desc: 'Hit Convert, watch real-time progress, then download individually or as a ZIP.' },
+];
+
+const FORMAT_SECTIONS = [
+  {
+    label: 'Image Input',
+    color: 'var(--gold)',
+    formats: ['HEIC', 'JPG', 'JPEG', 'PNG', 'WEBP', 'AVIF', 'TIFF', 'BMP', 'GIF', 'SVG'],
+  },
+  {
+    label: 'Image Output',
+    color: 'var(--gold)',
+    formats: ['JPG', 'PNG', 'WEBP', 'AVIF', 'TIFF', 'GIF', 'BMP'],
+  },
+  {
+    label: 'Video Input',
+    color: '#8A9ECC',
+    formats: ['HEVC', 'H.265', 'MP4', 'MOV', 'AVI', 'MKV', 'WEBM', 'FLV'],
+  },
+  {
+    label: 'Video Output',
+    color: '#8A9ECC',
+    formats: ['MP4', 'MOV', 'MKV', 'WEBM', 'AVI', 'GIF'],
+  },
+  {
+    label: 'Audio Input',
+    color: '#C08080',
+    formats: ['MP3', 'WAV', 'AAC', 'OGG', 'FLAC', 'M4A'],
+  },
+  {
+    label: 'Audio Output',
+    color: '#C08080',
+    formats: ['MP3', 'WAV', 'AAC', 'OGG', 'FLAC'],
+  },
+];
+
+const FOOTER_LINKS = {
+  'Image Conversions': [
+    'HEIC to JPG', 'HEIC to PNG', 'HEIC to WEBP', 'HEIC to AVIF',
+    'PNG to JPG', 'JPG to WEBP', 'WEBP to PNG', 'JPG to AVIF',
+    'PNG to WEBP', 'TIFF to JPG', 'BMP to PNG', 'GIF to WEBP',
+  ],
+  'Video Conversions': [
+    'HEVC to MP4', 'MOV to MP4', 'AVI to MP4', 'MKV to MP4',
+    'MP4 to WEBM', 'FLV to MP4', 'WEBM to MP4', 'MP4 to GIF',
+    'MOV to MKV', 'MP4 to MOV', 'AVI to MKV', 'HEVC to WEBM',
+  ],
+  'Audio Conversions': [
+    'MP3 to WAV', 'WAV to MP3', 'AAC to MP3', 'FLAC to MP3',
+    'OGG to MP3', 'M4A to MP3', 'WAV to FLAC', 'MP3 to OGG',
+    'AAC to WAV', 'FLAC to WAV', 'M4A to AAC', 'OGG to WAV',
+  ],
+};
+
+/* ══════════════════════════════════════════════════════════════ */
+function FeaturesSection() {
   return (
-    <div className="star-field">
-      {stars.map(s => (
-        <div
-          key={s.id}
-          className="star"
-          style={{
-            left: `${s.x}%`,
-            top: `${s.y}%`,
-            width: `${s.size}px`,
-            height: `${s.size}px`,
-            '--dur': `${s.dur}s`,
-            animationDelay: `${s.delay}s`,
-          }}
-        />
-      ))}
-    </div>
+    <section id="features" className="py-28 max-w-6xl mx-auto px-6">
+      <div className="text-center mb-16">
+        <span className="section-label">Why MediaMorph</span>
+        <div className="gold-rule mt-4 mb-6 max-w-xs mx-auto" />
+        <h2 className="display-lg text-3xl sm:text-4xl cream-text">
+          Built for professionals.<br />
+          <span className="gold-text">Free for everyone.</span>
+        </h2>
+      </div>
+      <div className="grid md:grid-cols-3 gap-6">
+        {FEATURES.map((f, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: .55, delay: i * .1 }}
+            className="feat-card"
+          >
+            <div className="feat-icon">
+              <f.Icon className="w-5 h-5" strokeWidth={1.8} />
+            </div>
+            <h3 className="display-sm text-lg cream-text mb-3">{f.title}</h3>
+            <p className="text-sm leading-relaxed muted-text">{f.desc}</p>
+          </motion.div>
+        ))}
+      </div>
+    </section>
   );
 }
 
-/* ── 3D Rotating Logo Cube ────────────────────────────────────────────────── */
-function LogoCube() {
+function HowSection() {
   return (
-    <div className="logo-3d-wrapper">
-      <div className="logo-3d">
-        <div className="logo-3d-face face-front">
-          <Layers className="w-5 h-5 text-white" strokeWidth={2.5} />
+    <section id="how" className="py-24" style={{ background: 'var(--bg-1)' }}>
+      <div className="max-w-5xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <span className="section-label">How It Works</span>
+          <div className="gold-rule mt-4 mb-6 max-w-xs mx-auto" />
+          <h2 className="display-lg text-3xl sm:text-4xl cream-text">Three steps. That's it.</h2>
         </div>
-        <div className="logo-3d-face face-back" />
-        <div className="logo-3d-face face-right" />
-        <div className="logo-3d-face face-left" />
-        <div className="logo-3d-face face-top" />
-        <div className="logo-3d-face face-bottom" />
+        <div className="grid md:grid-cols-3 gap-8">
+          {HOW_STEPS.map((s, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: .55, delay: i * .12 }}
+              className="flex flex-col items-center text-center"
+            >
+              <div className="section-number mb-6">{s.n}</div>
+              {i < HOW_STEPS.length - 1 && (
+                <div className="hidden md:block absolute" />
+              )}
+              <h3 className="display-sm text-lg cream-text mb-3">{s.title}</h3>
+              <p className="text-sm leading-relaxed muted-text">{s.desc}</p>
+            </motion.div>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 
-/* ── Stat Card ────────────────────────────────────────────────────────────── */
-function StatCard({ number, label }) {
+function FormatsSection() {
   return (
-    <div className="stat-card">
-      <div className="stat-card-inner">
-        <div className="stat-number">{number}</div>
-        <div className="text-xs font-medium mt-1" style={{ color: 'var(--text-muted)' }}>{label}</div>
+    <section id="formats" className="py-28 max-w-6xl mx-auto px-6">
+      <div className="text-center mb-16">
+        <span className="section-label">Supported Formats</span>
+        <div className="gold-rule mt-4 mb-6 max-w-xs mx-auto" />
+        <h2 className="display-lg text-3xl sm:text-4xl cream-text">
+          Every format. <span className="gold-text">Every category.</span>
+        </h2>
       </div>
-    </div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {FORMAT_SECTIONS.map((cat, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: .5, delay: i * .07 }}
+            className="card p-6"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-2 h-2 rounded-full" style={{ background: cat.color, boxShadow: `0 0 8px ${cat.color}` }} />
+              <span className="text-xs font-semibold tracking-widest uppercase" style={{ color: cat.color }}>{cat.label}</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {cat.formats.map(f => (
+                <span key={f} className="fmt-item">{f}</span>
+              ))}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </section>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════ */
-function App() {
-  const [files, setFiles] = useState([]);
-  const [downloadingMap, setDownloadingMap]   = useState({});
-  const [downloadingAll, setDownloadingAll]   = useState(false);
-  const [batchPrefix, setBatchPrefix]         = useState('');
-  const { scrollY } = useScroll();
-  const headerOpacity = useTransform(scrollY, [0, 80], [1, 0.85]);
+function Footer() {
+  return (
+    <footer className="footer">
+      <div className="max-w-6xl mx-auto px-6 py-20">
+        {/* Top */}
+        <div className="flex flex-col md:flex-row gap-12 mb-16">
+          <div className="md:w-72 flex-shrink-0">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="icon-wrap icon-image" style={{ width: 36, height: 36 }}>
+                <Layers className="w-4 h-4" strokeWidth={2} />
+              </div>
+              <span style={{ fontFamily: 'Playfair Display, serif', fontWeight: 700, fontSize: 16, color: 'var(--cream)' }}>
+                MediaMorph
+              </span>
+            </div>
+            <p className="text-sm leading-relaxed muted-text mb-6">
+              A professional-grade file converter that runs entirely on your local server. No cloud, no limits, no compromises.
+            </p>
+            <div className="flex gap-2 flex-wrap">
+              <span className="tag tag-gold">Open Source</span>
+              <span className="tag tag-muted">Self-hosted</span>
+              <span className="tag tag-green">Free Forever</span>
+            </div>
+          </div>
 
-  /* ── File selection ─────────────────────────────────────────────────────── */
-  const handleFilesSelected = (acceptedFiles) => {
-    const AUDIO_EXTS = /\.(mp3|wav|aac|ogg|flac|m4a)$/i;
-    const VIDEO_EXTS = /\.(hevc|h265|mp4|mov|avi|mkv|webm|flv)$/i;
+          {/* Format links grid */}
+          <div className="flex-1 grid sm:grid-cols-3 gap-10">
+            {Object.entries(FOOTER_LINKS).map(([cat, links]) => (
+              <div key={cat}>
+                <h4 className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: 'var(--gold)' }}>
+                  {cat}
+                </h4>
+                <ul className="space-y-2">
+                  {links.map(link => (
+                    <li key={link}>
+                      <a href="/#converter" className="footer-link block">{link}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
 
-    const newFiles = acceptedFiles.map(file => {
-      const name     = file.name.toLowerCase();
-      const isAudio  = AUDIO_EXTS.test(name) || file.type.startsWith('audio/');
-      const isVideo  = !isAudio && (VIDEO_EXTS.test(name) || file.type.startsWith('video/'));
+        <div className="gold-rule mb-8" />
+
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs muted-text">
+          <span>© 2025 MediaMorph. All conversions run locally on your server.</span>
+          <div className="flex gap-4">
+            <Link to="/legal" className="hover:text-white transition-colors">Privacy & Terms</Link>
+            <Link to="/analytics" className="hover:text-white transition-colors">Analytics</Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════ */
+/*  Main Home Page                                                */
+/* ══════════════════════════════════════════════════════════════ */
+function Home() {
+  const [files,          setFiles]          = useState([]);
+  const [downloadingMap, setDownloadingMap] = useState({});
+  const [downloadingAll, setDownloadingAll] = useState(false);
+  const [batchPrefix,    setBatchPrefix]    = useState('');
+
+  React.useEffect(() => {
+    const handleBeforeUnload = () => {
+      const jobIds = files.filter(f => f.jobId).map(f => f.jobId);
+      if (jobIds.length > 0) {
+        navigator.sendBeacon(`${API_URL}/convert/cleanup`, new Blob([JSON.stringify({ jobIds })], { type: 'application/json' }));
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [files]);
+
+  const handleFilesSelected = (accepted) => {
+    const AUDIO = /\.(mp3|wav|aac|ogg|flac|m4a)$/i;
+    const VIDEO = /\.(hevc|h265|mp4|mov|avi|mkv|webm|flv)$/i;
+    const newFiles = accepted.map(file => {
+      const n = file.name.toLowerCase();
+      const isAudio = AUDIO.test(n) || file.type.startsWith('audio/');
+      const isVideo = !isAudio && (VIDEO.test(n) || file.type.startsWith('video/'));
       const fileType = isAudio ? 'audio' : isVideo ? 'video' : 'image';
       return {
-        id: crypto.randomUUID(),
-        file,
-        fileType,
-        status: 'idle',
-        progress: 0,
+        id: crypto.randomUUID(), file, fileType, status: 'idle', progress: 0,
         targetFormat: isAudio ? 'mp3' : isVideo ? 'mp4' : 'jpg',
         fileId: null, jobId: null, outFileName: null, cleanName: null, errorMsg: null,
       };
@@ -100,79 +290,90 @@ function App() {
     setFiles(prev => [...prev, ...newFiles]);
   };
 
-  const handleFormatChange = (id, targetFormat) =>
-    setFiles(prev => prev.map(f => f.id === id ? { ...f, targetFormat } : f));
+  const handleFormatChange = (id, fmt) =>
+    setFiles(prev => prev.map(f => f.id === id ? { ...f, targetFormat: fmt } : f));
 
-  const handleRemove = (id) =>
+  const handleRemove = async (id) => {
+    const file = files.find(f => f.id === id);
+    if (file && file.jobId && file.status === 'completed') {
+      try { await deleteFile(file.jobId); } catch (e) { console.error('Failed to delete', e); }
+    }
     setFiles(prev => prev.filter(f => f.id !== id));
+  };
 
-  /* ── Convert all ────────────────────────────────────────────────────────── */
   const handleConvertAll = async () => {
-    const idleFiles = files.filter(f => f.status === 'idle');
-    if (idleFiles.length === 0) return;
-
-    const formData = new FormData();
-    idleFiles.forEach(f => formData.append('files', f.file));
-
+    const idle = files.filter(f => f.status === 'idle');
+    if (!idle.length) return;
+    const fd = new FormData();
+    idle.forEach(f => fd.append('files', f.file));
     try {
-      setFiles(prev => prev.map(f =>
-        idleFiles.find(xf => xf.id === f.id) ? { ...f, status: 'uploading' } : f
-      ));
-
-      const response = await uploadFiles(formData, (progressEvent) => {
-        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-        setFiles(prev => prev.map(f =>
-          idleFiles.find(xf => xf.id === f.id) ? { ...f, progress: percent } : f
-        ));
+      setFiles(prev => prev.map(f => idle.find(x => x.id === f.id) ? { ...f, status: 'uploading' } : f));
+      const res = await uploadFiles(fd, pe => {
+        const pct = Math.round((pe.loaded * 100) / pe.total);
+        setFiles(prev => prev.map(f => idle.find(x => x.id === f.id) ? { ...f, progress: pct } : f));
       });
-
-      const uploadedFiles = response.data.files;
-      let counter = 1;
+      let cnt = 1;
       setFiles(prev => prev.map(f => {
-        const upFile = uploadedFiles.find(uf => uf.originalName === f.file.name);
-        if (upFile && f.status === 'uploading') {
-          const finalBaseName = batchPrefix.trim()
-            ? `${batchPrefix.trim()}_${String(counter++).padStart(3, '0')}`
-            : f.file.name.split('.')[0];
-          startJob(f.id, upFile.id, f.file.name, f.targetFormat, finalBaseName);
-          return { ...f, status: 'processing', progress: 0, fileId: upFile.id };
+        // Case-insensitive match so 'Photo.PNG' matches 'photo.png'
+        const up = res.data.files.find(u =>
+          u.originalName.toLowerCase() === f.file.name.toLowerCase()
+        );
+        if (up && f.status === 'uploading') {
+          const base = batchPrefix.trim()
+            ? `${batchPrefix.trim()}_${String(cnt++).padStart(3, '0')}`
+            : f.file.name.replace(/\.[^.]+$/, '');
+          startJob(f.id, up.id, f.file.name, f.targetFormat, base);
+          return { ...f, status: 'processing', progress: 0, fileId: up.id, startTime: Date.now() };
+        }
+        if (f.status === 'uploading') {
+          // File was uploaded but backend name didn't match — flag it
+          return { ...f, status: 'failed', errorMsg: 'Upload mapping failed — try again' };
         }
         return f;
       }));
-    } catch (error) {
-      console.error('Upload failed', error);
-      setFiles(prev => prev.map(f =>
-        idleFiles.find(xf => xf.id === f.id) ? { ...f, status: 'failed', progress: 0 } : f
-      ));
+    } catch (err) {
+      const msg = err?.response?.data?.error || err?.message || 'Upload failed';
+      setFiles(prev => prev.map(f => idle.find(x => x.id === f.id) ? { ...f, status: 'failed', progress: 0, errorMsg: msg } : f));
     }
   };
 
-  const startJob = async (localFileId, backendFileId, originalName, targetFormat, finalBaseName) => {
+  const startJob = async (localId, backendId, origName, format, base) => {
     try {
-      const res = await startConversion({ fileId: backendFileId, inputFormat: originalName.split('.').pop(), outputFormat: targetFormat, originalName, finalBaseName });
+      const res = await startConversion({
+        fileId: backendId,
+        outputFormat: format,
+        originalName: origName,
+        finalBaseName: base,
+      });
       const { jobId, outFileName, cleanName } = res.data;
-      setFiles(prev => prev.map(f => f.id === localFileId ? { ...f, jobId, outFileName, cleanName } : f));
-      pollJobStatus(localFileId, jobId);
-    } catch {
-      setFiles(prev => prev.map(f => f.id === localFileId ? { ...f, status: 'failed' } : f));
+      setFiles(prev => prev.map(f => f.id === localId ? { ...f, jobId, outFileName, cleanName } : f));
+      pollStatus(localId, jobId);
+    } catch (err) {
+      const msg = err?.response?.data?.error || err?.message || 'Conversion request failed';
+      console.error('[startJob] error:', msg, err);
+      setFiles(prev => prev.map(f => f.id === localId ? { ...f, status: 'failed', errorMsg: msg } : f));
     }
   };
 
-  const pollJobStatus = (localFileId, jobId) => {
-    const interval = setInterval(async () => {
+  const pollStatus = (localId, jobId) => {
+    const iv = setInterval(async () => {
       try {
-        const res = await checkJobStatus(jobId);
-        const { status, progress, error: errMsg } = res.data;
+        const { data } = await checkJobStatus(jobId);
         setFiles(prev => prev.map(f => {
-          if (f.id !== localFileId) return f;
-          return { ...f, status, progress: status === 'completed' ? 100 : (progress || 0), errorMsg: errMsg || null };
+          if (f.id !== localId) return f;
+          return {
+            ...f,
+            status: data.status,
+            progress: data.status === 'completed' ? 100 : (data.progress || 0),
+            errorMsg: data.error || null,
+            endTime: (data.status === 'completed' && !f.endTime) ? Date.now() : f.endTime,
+          };
         }));
-        if (status === 'completed' || status === 'failed') clearInterval(interval);
-      } catch {
-        clearInterval(interval);
-        setFiles(prev => prev.map(f =>
-          f.id === localFileId ? { ...f, status: 'failed', errorMsg: 'Connection lost' } : f
-        ));
+        if (data.status === 'completed' || data.status === 'failed') clearInterval(iv);
+      } catch (err) {
+        clearInterval(iv);
+        const msg = err?.message || 'Lost connection to server';
+        setFiles(prev => prev.map(f => f.id === localId ? { ...f, status: 'failed', errorMsg: msg } : f));
       }
     }, 2000);
   };
@@ -181,261 +382,218 @@ function App() {
     const f = files.find(x => x.id === id);
     setDownloadingMap(p => ({ ...p, [id]: true }));
     try {
-      const url  = downloadFileUrl(filename);
-      const link = document.createElement('a');
-      link.href  = url;
-      link.setAttribute('download', f?.cleanName || filename);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
+      const a = document.createElement('a');
+      a.href = downloadFileUrl(filename);
+      a.setAttribute('download', f?.cleanName || filename);
+      document.body.appendChild(a); a.click(); a.remove();
     } finally {
       setDownloadingMap(p => ({ ...p, [id]: false }));
     }
   };
 
   const handleDownloadAll = async () => {
-    const completedFiles = files.filter(f => f.status === 'completed');
-    if (completedFiles.length === 0) return;
+    const done = files.filter(f => f.status === 'completed');
+    if (!done.length) return;
     setDownloadingAll(true);
     try {
-      const payload  = completedFiles.map(f => ({ serverName: f.outFileName, cleanName: f.cleanName || f.outFileName }));
-      const response = await downloadBatch(payload);
-      const url  = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href  = url;
-      link.setAttribute('download', 'MediaMorph_Batch.zip');
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-    } catch (e) {
-      console.error('Batch download failed', e);
-    } finally {
-      setDownloadingAll(false);
-    }
+      const payload = done.map(f => ({ serverName: f.outFileName, cleanName: f.cleanName || f.outFileName }));
+      const res = await downloadBatch(payload);
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const a = document.createElement('a');
+      a.href = url; a.setAttribute('download', 'MediaMorph_Batch.zip');
+      document.body.appendChild(a); a.click(); a.remove();
+    } catch (e) { console.error(e); }
+    finally { setDownloadingAll(false); }
   };
 
-  const idleCount      = files.filter(f => f.status === 'idle').length;
-  const completedCount = files.filter(f => f.status === 'completed').length;
-  const processingCount = files.filter(f => f.status === 'processing' || f.status === 'uploading').length;
+  const idleCount = files.filter(f => f.status === 'idle').length;
+  const doneCount = files.filter(f => f.status === 'completed').length;
 
-  /* ─────────────────────────────────────────────────────────────────────── */
+  /* ────────────────────────────────────────────────────────── */
   return (
-    <div className="relative min-h-screen" style={{ background: 'var(--bg-void)' }}>
+    <div className="relative min-h-screen" style={{ background: 'var(--bg)' }}>
+      {/* Ambient orbs */}
+      <div className="orb-bg">
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+        <div className="orb orb-3" />
+      </div>
+      <div className="grain" />
 
-      {/* ── 3D Background Scene ───────────────────────────────────────────── */}
-      <div className="bg-scene">
-        <StarField count={100} />
-        <div className="bg-blob bg-blob-1" />
-        <div className="bg-blob bg-blob-2" />
-        <div className="bg-blob bg-blob-3" />
-        <div className="grid-floor" />
+      {/* Navbar */}
+      <div className="relative z-50">
+        <Navbar />
       </div>
 
-      {/* ── Navbar ────────────────────────────────────────────────────────── */}
-      <motion.nav
-        style={{ opacity: headerOpacity }}
-        className="relative z-50 px-6 py-4"
-      >
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <LogoCube />
-            <div>
-              <span className="font-bold text-lg tracking-tight" style={{ fontFamily: 'Syne, sans-serif', color: 'var(--text-primary)' }}>
-                MediaMorph
-              </span>
-              <div className="text-xs" style={{ color: 'var(--text-dim)' }}>Universal Converter</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="hero-badge">
-              <span className="hero-badge-dot" />
-              All servers online
-            </div>
-          </div>
-        </div>
-      </motion.nav>
-
-      {/* ── Main Content ──────────────────────────────────────────────────── */}
-      <main className="relative z-10 max-w-5xl mx-auto px-6 pb-32">
-
-        {/* ── Hero ────────────────────────────────────────────────────────── */}
-        <motion.section
-          initial={{ opacity: 0, y: 40 }}
+      {/* ── Hero ──────────────────────────────────────────────── */}
+      <section className="relative z-10 pt-24 pb-20 max-w-5xl mx-auto px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-center pt-10 pb-14"
+          transition={{ duration: .7 }}
+          className="text-center mb-16"
         >
-          {/* Floating decorative orbs */}
-          <div className="float-anim" style={{ position: 'absolute', left: '8%', top: '12%', width: 60, height: 60, borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.3), transparent)', filter: 'blur(10px)', pointerEvents: 'none' }} />
-          <div className="float-anim-delay" style={{ position: 'absolute', right: '10%', top: '20%', width: 40, height: 40, borderRadius: '50%', background: 'radial-gradient(circle, rgba(6,182,212,0.3), transparent)', filter: 'blur(8px)', pointerEvents: 'none' }} />
-
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
-            className="inline-block mb-6"
-          >
-            <span className="hero-badge">
-              <Zap className="w-3 h-3" />
-              Phase 1 — 18+ Formats
+          <motion.div initial={{ scale: .9 }} animate={{ scale: 1 }} transition={{ delay: .1 }} className="inline-block mb-6">
+            <span className="hero-label">
+              <span className="live-dot" />
+              Universal File Converter
             </span>
           </motion.div>
 
-          <motion.h1
-            className="hero-title text-5xl sm:text-6xl lg:text-7xl mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.7 }}
-          >
-            Convert<br />
-            <span style={{ color: '#fff', WebkitTextFillColor: 'unset' }}>strictly </span>
-            everything<span style={{ WebkitTextFillColor: 'unset', color: '#7c3aed' }}>.</span>
-          </motion.h1>
+          <h1 className="display-xl text-5xl sm:text-6xl lg:text-7xl cream-text mb-6">
+            Convert anything.<br />
+            <em style={{ fontStyle: 'italic', color: 'var(--gold)', WebkitTextStroke: 0 }}>Instantly.</em>
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.35 }}
-            className="text-lg max-w-xl mx-auto mb-12"
-            style={{ color: 'var(--text-muted)', lineHeight: 1.7 }}
-          >
-            Drop entire folders or bulk files. Images, videos, audio — all converted
-            instantly on your server. Zero cloud, zero limits.
-          </motion.p>
+          <p className="text-base sm:text-lg leading-relaxed muted-text max-w-2xl mx-auto mb-10">
+            Batch convert images, video, and audio with zero quality loss.
+            Runs entirely on your server — private, fast, and free.
+          </p>
 
-          {/* Stat row */}
+          {/* Stat chips */}
+          <div className="flex flex-wrap justify-center gap-3 mb-16">
+            {[
+              { n: '18+',   l: 'Output Formats' },
+              { n: '500MB', l: 'Max File Size'  },
+              { n: 'Batch', l: 'Processing'     },
+              { n: '100%',  l: 'Private'        },
+            ].map((s, i) => (
+              <motion.div
+                key={i}
+                whileHover={{ y: -4 }}
+                className="card-sm px-5 py-3 flex flex-col items-center"
+                style={{ minWidth: 90 }}
+              >
+                <span className="font-bold text-lg gold-text" style={{ fontFamily: 'Playfair Display, serif' }}>{s.n}</span>
+                <span className="text-xs muted-text mt-0.5">{s.l}</span>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ── Converter tool ──────────────────────────────────── */}
+        <div id="converter">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45 }}
-            className="flex flex-wrap justify-center gap-4 mb-16"
+            transition={{ delay: .35, duration: .6 }}
+            className="card-hero p-8"
           >
-            <StatCard number="18+" label="Output Formats" />
-            <StatCard number="500MB" label="Max File Size" />
-            <StatCard number="0ms" label="Cloud Latency" />
-            <StatCard number="∞" label="Batch Files" />
-          </motion.div>
-        </motion.section>
-
-        {/* ── Upload Section ────────────────────────────────────────────────── */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          className="mb-8"
-        >
-          <UploadBox onFilesSelected={handleFilesSelected} />
-        </motion.section>
-
-        {/* ── Batch Rename Panel ────────────────────────────────────────────── */}
-        <AnimatePresence>
-          {files.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="mb-6 overflow-hidden"
-            >
-              <div className="glass-card p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <div className="flex-1 w-full">
-                  <label className="section-label block mb-2">Batch Rename Prefix</label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="e.g. vacation_pic  →  vacation_pic_001.jpg"
-                      value={batchPrefix}
-                      onChange={(e) => setBatchPrefix(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl text-sm"
-                      style={{
-                        background: 'rgba(4,4,15,0.6)',
-                        border: '1px solid rgba(124,58,237,0.25)',
-                        color: 'var(--text-primary)',
-                        fontFamily: 'Space Grotesk, sans-serif',
-                        outline: 'none',
-                        transition: 'border-color 0.2s',
-                      }}
-                      onFocus={e => e.target.style.borderColor = 'rgba(124,58,237,0.7)'}
-                      onBlur={e => e.target.style.borderColor = 'rgba(124,58,237,0.25)'}
-                    />
-                  </div>
-                </div>
-                {/* Live status chips */}
-                <div className="flex gap-2 flex-shrink-0 flex-wrap">
-                  {processingCount > 0 && (
-                    <span className="format-pill pill-video">{processingCount} converting…</span>
-                  )}
-                  {completedCount > 0 && (
-                    <span className="format-pill" style={{ background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' }}>
-                      {completedCount} ready
-                    </span>
-                  )}
-                  <span className="format-pill pill-heic">{files.length} total</span>
-                </div>
+            {/* Panel header */}
+            <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+              <div>
+                <span className="section-label block mb-1">Conversion Studio</span>
+                <h2 className="display-sm text-xl cream-text">Upload & Convert</h2>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <AnimatePresence>
+                {files.length > 0 && (
+                  <motion.div initial={{ opacity: 0, scale: .9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+                    className="flex gap-2 flex-wrap">
+                    {doneCount > 0 && (
+                      <button onClick={handleDownloadAll} disabled={downloadingAll} className="btn btn-success" style={{ fontSize: 13, padding: '10px 18px' }}>
+                        <FolderArchive className="w-4 h-4" />
+                        {downloadingAll ? 'Zipping…' : `Download All (${doneCount})`}
+                      </button>
+                    )}
+                    {idleCount > 0 && (
+                      <button onClick={handleConvertAll} className="btn btn-gold" style={{ fontSize: 13, padding: '10px 20px' }}>
+                        <Zap className="w-4 h-4" />
+                        Convert ({idleCount})
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
-        {/* ── File List ─────────────────────────────────────────────────────── */}
-        <FileList
-          files={files}
-          onRemove={handleRemove}
-          onFormatChange={handleFormatChange}
-          onDownload={downloadFile}
-          downloadingMap={downloadingMap}
-        />
+            <div className="gold-rule mb-6" />
 
-        {/* ── Action Buttons ────────────────────────────────────────────────── */}
-        <AnimatePresence>
-          {files.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.3 }}
-              className="mt-8 flex justify-end gap-3 flex-wrap"
-            >
-              {completedCount > 0 && (
-                <button
-                  onClick={handleDownloadAll}
-                  disabled={downloadingAll}
-                  className="btn-primary btn-success"
+            {/* Upload zone */}
+            <UploadBox onFilesSelected={handleFilesSelected} />
+
+            {/* Batch rename */}
+            <AnimatePresence>
+              {files.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  style={{ overflow: 'hidden' }}
+                  className="mt-4"
                 >
-                  <FolderArchive className="w-4 h-4" />
-                  {downloadingAll ? 'Zipping…' : `Download All (${completedCount}) ZIP`}
-                </button>
+                  <div className="card-sm p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                    <div className="flex-1">
+                      <label className="section-label block mb-2">Batch Rename Prefix <span className="muted-text font-normal normal-case tracking-normal text-xs">(optional)</span></label>
+                      <input type="text" placeholder="e.g. project_photo → project_photo_001.jpg"
+                        value={batchPrefix} onChange={e => setBatchPrefix(e.target.value)}
+                        className="lux-input" />
+                    </div>
+                    <div className="flex gap-2 flex-wrap flex-shrink-0">
+                      <span className="tag tag-gold">{files.length} total</span>
+                      {doneCount > 0 && <span className="tag tag-green">{doneCount} ready</span>}
+                    </div>
+                  </div>
+                </motion.div>
               )}
+            </AnimatePresence>
 
-              {idleCount > 0 && (
-                <button onClick={handleConvertAll} className="btn-primary">
-                  <Zap className="w-4 h-4" />
-                  Convert Now ({idleCount})
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+            {/* File list */}
+            <FileList
+              files={files}
+              onRemove={handleRemove}
+              onFormatChange={handleFormatChange}
+              onDownload={downloadFile}
+              downloadingMap={downloadingMap}
+            />
+
+            {/* Bottom actions */}
+            <AnimatePresence>
+              {files.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="mt-6 flex justify-end gap-3 flex-wrap"
+                >
+                  {doneCount > 0 && (
+                    <button onClick={handleDownloadAll} disabled={downloadingAll} className="btn btn-success" style={{ fontSize: 13, padding: '11px 22px' }}>
+                      <FolderArchive className="w-4 h-4" />
+                      {downloadingAll ? 'Zipping…' : `Download All ZIP (${doneCount})`}
+                    </button>
+                  )}
+                  {idleCount > 0 && (
+                    <button onClick={handleConvertAll} className="btn btn-gold" style={{ fontSize: 13, padding: '11px 24px' }}>
+                      <Zap className="w-4 h-4" /> Convert Now ({idleCount}) <ArrowRight className="w-4 h-4" />
+                    </button>
+                  )}
+                </motion.div>
               )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Footer ───────────────────────────────────────────────────────── */}
-        {files.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="mt-20 text-center"
-          >
-            <div className="divider mb-8" />
-            <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
-              MediaMorph · All conversions run locally · No data leaves your machine
-            </p>
+            </AnimatePresence>
           </motion.div>
-        )}
-      </main>
+        </div>
+      </section>
+
+      {/* ── Other sections ─────────────────────────────────────── */}
+      <div className="relative z-10">
+        <FeaturesSection />
+        <HowSection />
+        <FormatsSection />
+        <Footer />
+      </div>
     </div>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <>
+      <CookieConsent />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/legal" element={<Legal />} />
+      </Routes>
+    </>
+  );
+}

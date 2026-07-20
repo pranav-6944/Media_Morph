@@ -92,4 +92,5 @@ function compressVideo(inputPath, outputPath, crf = 26, progressCallback) {
     });
 }
 
+
 module.exports = { convertVideo, videoToGif, compressVideo };

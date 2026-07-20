@@ -1,22 +1,27 @@
 const sharp = require('sharp');
 
 /**
- * Converts any sharp-supported image to a target format.
- * Supports: jpg, jpeg, png, webp, avif, tiff, gif
+ * Converts any sharp-supported image to the target format.
+ * Sharp supported outputs: jpeg, png, webp, avif, tiff, gif
+ * NOTE: BMP is NOT supported by sharp as output format.
  */
 async function convertImage(inputPath, outputPath, format, quality = 85) {
-    const normalizedFormat = format.toLowerCase() === 'jpg' ? 'jpeg' : format.toLowerCase();
+    // Normalise: 'jpg' → 'jpeg'
+    const fmt = format.toLowerCase() === 'jpg' ? 'jpeg' : format.toLowerCase();
 
-    const sharpFormats = ['jpeg', 'png', 'webp', 'avif', 'tiff', 'gif'];
-    if (!sharpFormats.includes(normalizedFormat)) {
-        throw new Error(`Unsupported image format: ${format}`);
+    const SUPPORTED = ['jpeg', 'png', 'webp', 'avif', 'tiff', 'gif'];
+    if (!SUPPORTED.includes(fmt)) {
+        throw new Error(
+            `Unsupported image output format: "${format}". ` +
+            `Supported formats: ${SUPPORTED.join(', ')}`
+        );
     }
 
-    const qualityFormats = ['jpeg', 'webp', 'avif'];
-    const options = qualityFormats.includes(normalizedFormat) ? { quality } : {};
+    const QUALITY_FMTS = ['jpeg', 'webp', 'avif'];
+    const options = QUALITY_FMTS.includes(fmt) ? { quality } : {};
 
     await sharp(inputPath)
-        .toFormat(normalizedFormat, options)
+        .toFormat(fmt, options)
         .toFile(outputPath);
 }
 

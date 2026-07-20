@@ -6,7 +6,8 @@ const archiver = require('archiver');
 const router = express.Router();
 
 router.get('/:filename', (req, res) => {
-    const filePath = path.join(__dirname, '../converted', req.params.filename);
+    const filename = path.basename(req.params.filename);
+    const filePath = path.join(__dirname, '../converted', filename);
     if (fs.existsSync(filePath)) {
         res.download(filePath);
     } else {
@@ -33,9 +34,11 @@ router.post('/batch', (req, res) => {
     archive.pipe(res);
 
     files.forEach(fileObj => {
-        const filePath = path.join(__dirname, '../converted', fileObj.serverName);
+        if (!fileObj || !fileObj.serverName) return;
+        const serverName = path.basename(fileObj.serverName);
+        const filePath = path.join(__dirname, '../converted', serverName);
         if (fs.existsSync(filePath)) {
-            archive.file(filePath, { name: fileObj.cleanName });
+            archive.file(filePath, { name: fileObj.cleanName || serverName });
         }
     });
 

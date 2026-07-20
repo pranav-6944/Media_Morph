@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const uploadFiles = (formData, onUploadProgress) => {
   return axios.post(`${API_URL}/upload`, formData, {
@@ -25,4 +25,12 @@ export const downloadBatch = (filesData) => {
   return axios.post(`${API_URL}/download/batch`, { files: filesData }, {
     responseType: 'arraybuffer'
   });
+};
+
+export const deleteFile = (jobId) => {
+  return axios.delete(`${API_URL}/convert/${jobId}`);
+};
+
+export const getStats = () => {
+  return axios.get(`${API_URL}/stats`);
 };

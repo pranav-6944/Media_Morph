@@ -71,7 +71,17 @@ Root/
 
 ## Identified Gaps / Potential Next Features
 1. **No cleanup**: `uploads/` and `converted/` dirs grow indefinitely — need periodic purge
-2. **No file size limit enforcement in UI**: multer may have limits; UI doesn't warn users
+2. **No file size limit enforcement in UI**: multer may have limits;# AI Notes — MediaMorph
+
+## Luxury Redesign (2026-07-20)
+- **Design system**: Obsidian bg (#09080F), Champagne Gold (#C09A5F), Warm Cream (#EAE0CE)
+- **Fonts**: Playfair Display (h1/h2/h3) + DM Sans (body/UI)
+- **Key CSS classes**: `.card`, `.card-hero`, `.btn-gold`, `.btn-outline`, `.feat-card`, `.upload-zone`, `.file-row`, `.fmt-select`, `.dl-btn`, `.lux-input`
+- **Shadow system**: `--sh-sm/md/lg` — warm obsidian multi-layer shadows with gold inset highlight
+- **Sections**: Navbar (Navbar.jsx) → Hero+Converter → Features → HowItWorks → FormatsGrid → Footer (all in App.jsx)
+- **Components**: Navbar.jsx (L1-80), UploadBox.jsx (L1-75), FileList.jsx (L1-110), FormatSelector.jsx (L1-45)
+- **All conversion logic intact** in App.jsx: handleConvertAll, startJob, pollStatus, downloadFile, handleDownloadAll
+- **Deleted**: App.css (legacy)n't warn users
 3. **No progress for images**: HEIC image conversion shows 0% until complete (no progress callback in heic-convert)
 4. **In-memory job store**: Server restart loses all job data — no persistence
 5. **No error detail surfaced to user**: Failed jobs just show "Failed" with no message

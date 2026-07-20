@@ -2,18 +2,59 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="MediaMorph — Convert HEIC, HEVC, images, videos and audio files instantly. Zero quality loss, batch processing, all formats." />
-    <meta name="theme-color" content="#0a0a1a" />
-    <title>MediaMorph | Universal File Converter</title>
+    
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="MediaMorph | Professional File Converter" />
+    <meta name="description" content="MediaMorph — Convert HEIC, images, video and audio instantly. Batch processing, 18+ formats, zero cloud. Fast, secure, and private." />
+    <meta name="keywords" content="HEIC converter, video converter, audio converter, batch image converter, convert mp4, convert webp, private file converter" />
+    <meta name="author" content="MediaMorph" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="theme-color" content="#09080F" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mediamorph.app/" />
+    <meta property="og:title" content="MediaMorph | Professional File Converter" />
+    <meta property="og:description" content="Convert HEIC, images, video and audio instantly. Batch processing, 18+ formats, zero cloud. Fast, secure, and private." />
+    <meta property="og:image" content="/logo.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://mediamorph.app/" />
+    <meta property="twitter:title" content="MediaMorph | Professional File Converter" />
+    <meta property="twitter:description" content="Convert HEIC, images, video and audio instantly. Batch processing, 18+ formats, zero cloud. Fast, secure, and private." />
+    <meta property="twitter:image" content="/logo.png" />
+
+    <!-- Geo-Targeting (Optional Global) -->
+    <meta name="geo.region" content="US" />
+    <meta name="geo.placename" content="Global" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>MediaMorph | Professional File Converter</title>
+    <script>
+      (function() {
+        try {
+          var theme = localStorage.getItem('theme') || 'system';
+          if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          } else if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+          } else {
+            // System
+            if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+              document.documentElement.setAttribute('data-theme', 'light');
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
-</html>
 
