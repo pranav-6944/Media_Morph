@@ -11,23 +11,28 @@ function App() {
   const [batchPrefix, setBatchPrefix] = useState('');
 
   const handleFilesSelected = (acceptedFiles) => {
-    // Only accept relevant files by filtering
-    const validFiles = acceptedFiles.filter(f => 
-      f.name.match(/\.(heic|hevc|h265|mp4|mov)$/i) || f.type.includes('video') || f.type.includes('image')
-    );
+    const AUDIO_EXTS = /\.(mp3|wav|aac|ogg|flac|m4a)$/i;
+    const VIDEO_EXTS = /\.(hevc|h265|mp4|mov|avi|mkv|webm|flv)$/i;
 
-    const newFiles = validFiles.map(file => {
-      const isVideo = file.type.includes('video') || file.name.toLowerCase().match(/\.(hevc|mp4|mov)$/i);
+    const newFiles = acceptedFiles.map(file => {
+      const name = file.name.toLowerCase();
+      const isAudio = AUDIO_EXTS.test(name) || file.type.startsWith('audio/');
+      const isVideo = !isAudio && (VIDEO_EXTS.test(name) || file.type.startsWith('video/'));
+      const fileType = isAudio ? 'audio' : isVideo ? 'video' : 'image';
+      const defaultFormat = isAudio ? 'mp3' : isVideo ? 'mp4' : 'jpg';
+
       return {
         id: crypto.randomUUID(),
         file,
-        status: 'idle', 
+        fileType,
+        status: 'idle',
         progress: 0,
-        targetFormat: isVideo ? 'mp4' : 'jpg',
-        fileId: null, 
-        jobId: null, 
+        targetFormat: defaultFormat,
+        fileId: null,
+        jobId: null,
         outFileName: null,
-        cleanName: null
+        cleanName: null,
+        errorMsg: null,
       };
     });
     setFiles(prev => [...prev, ...newFiles]);
@@ -97,17 +102,24 @@ function App() {
     const interval = setInterval(async () => {
       try {
         const res = await checkJobStatus(jobId);
-        const { status, progress } = res.data;
-        
+        const { status, progress, error: errMsg } = res.data;
+
         setFiles(prev => prev.map(f => {
-          if (f.id === localFileId) return { ...f, status, progress: status === 'completed' ? 100 : progress };
+          if (f.id === localFileId) return {
+            ...f,
+            status,
+            progress: status === 'completed' ? 100 : (progress || 0),
+            errorMsg: errMsg || null,
+          };
           return f;
         }));
 
         if (status === 'completed' || status === 'failed') clearInterval(interval);
       } catch (error) {
         clearInterval(interval);
-        setFiles(prev => prev.map(f => f.id === localFileId ? { ...f, status: 'failed' } : f));
+        setFiles(prev => prev.map(f =>
+          f.id === localFileId ? { ...f, status: 'failed', errorMsg: 'Connection lost' } : f
+        ));
       }
     }, 2000);
   };

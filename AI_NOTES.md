@@ -91,3 +91,34 @@ Root/
 - Add proper error messages from backend to frontend
 - Add multi-page routing (Home, History, Settings) using react-router-dom
 - Package as Electron desktop app
+
+## Conversion Expansion Plan (2026-07-20)
+- See full plan: `brain/571e0c99.../conversion_plan.md`
+
+### Phase 1 — Zero New Installs (sharp + ffmpeg already present)
+- Accept JPG/PNG/BMP/SVG as inputs (not just HEIC)
+- Image → AVIF, TIFF (sharp)
+- Video → MKV, MOV, WEBM (ffmpeg)
+- Video → GIF (ffmpeg palette filter)
+- Video → MP3/WAV (ffmpeg noVideo())
+- Video compress mode
+
+### Phase 2 — PDF Support
+- Images → PDF: `npm install pdfkit`
+- PDF → JPG per page: `npm install pdf-poppler`
+
+### Phase 3 — Advanced
+- Video resolution scaling (720p/1080p presets)
+- Multiple images → animated GIF
+- Full audio pipeline (MP3↔WAV↔FLAC)
+
+### Key Architecture Change (convert.js)
+- Replace two-branch format check with 4 arrays:
+  IMAGE_FORMATS, VIDEO_FORMATS, AUDIO_FORMATS, DOCUMENT_FORMATS
+- New helpers: image-helper.js, audio-helper.js, pdf-helper.js
+
+### Frontend Changes Needed
+- App.jsx:13 — detect 3 types: isImage, isVideo, isAudio
+- FormatSelector.jsx — add isAudio prop, audio format options
+- UploadBox.jsx — expand accept types to include audio/image extensions
+- FileList.jsx — add 3rd badge style (orange) for audio files

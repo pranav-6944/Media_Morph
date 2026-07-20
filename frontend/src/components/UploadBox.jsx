@@ -13,11 +13,34 @@ const UploadBox = ({ onFilesSelected }) => {
 
   const { getRootProps, isDragActive } = useDropzone({ 
     onDrop,
-    noClick: true, // Disable traditional click so custom buttons handle it natively for attributes
+    noClick: true,
     accept: {
-      'image/heic': ['.heic'],
-      'video/mp4': ['.mp4', '.mov'],
-      'video/hevc': ['.hevc', '.h265']
+      // HEIC / HEVC
+      'image/heic':  ['.heic'],
+      'video/hevc':  ['.hevc', '.h265'],
+      // Images
+      'image/jpeg':  ['.jpg', '.jpeg'],
+      'image/png':   ['.png'],
+      'image/webp':  ['.webp'],
+      'image/avif':  ['.avif'],
+      'image/tiff':  ['.tiff', '.tif'],
+      'image/bmp':   ['.bmp'],
+      'image/gif':   ['.gif'],
+      'image/svg+xml': ['.svg'],
+      // Videos
+      'video/mp4':   ['.mp4'],
+      'video/quicktime': ['.mov'],
+      'video/x-msvideo': ['.avi'],
+      'video/x-matroska': ['.mkv'],
+      'video/webm':  ['.webm'],
+      'video/x-flv': ['.flv'],
+      // Audio
+      'audio/mpeg':  ['.mp3'],
+      'audio/wav':   ['.wav'],
+      'audio/aac':   ['.aac'],
+      'audio/ogg':   ['.ogg'],
+      'audio/flac':  ['.flac'],
+      'audio/x-m4a': ['.m4a'],
     }
   });
 
@@ -27,6 +50,15 @@ const UploadBox = ({ onFilesSelected }) => {
       e.target.value = ''; 
     }
   };
+
+  const badges = [
+    { label: 'HEIC', color: 'text-indigo-400' },
+    { label: 'HEVC', color: 'text-purple-400' },
+    { label: 'MP4/MOV', color: 'text-blue-400' },
+    { label: 'JPG/PNG', color: 'text-emerald-400' },
+    { label: 'MP3/WAV', color: 'text-orange-400' },
+    { label: '+ more', color: 'text-slate-500' },
+  ];
 
   return (
     <motion.div 
@@ -45,7 +77,7 @@ const UploadBox = ({ onFilesSelected }) => {
             {isDragActive ? 'Drop your files or folders here' : 'Drag & drop files or folders'}
           </h3>
           <p className="text-slate-400 mt-2">
-            or choose an option below
+            Images · Videos · Audio · and more
           </p>
         </div>
 
@@ -55,7 +87,7 @@ const UploadBox = ({ onFilesSelected }) => {
             ref={fileInputRef} 
             className="hidden" 
             multiple 
-            accept=".heic,.mp4,.mov,.hevc,.h265"
+            accept=".heic,.hevc,.h265,.jpg,.jpeg,.png,.webp,.avif,.tiff,.bmp,.gif,.svg,.mp4,.mov,.avi,.mkv,.webm,.flv,.mp3,.wav,.aac,.ogg,.flac,.m4a"
             onChange={handleInputChange} 
           />
           <input 
@@ -87,10 +119,12 @@ const UploadBox = ({ onFilesSelected }) => {
           </button>
         </div>
 
-        <div className="flex space-x-4 mt-8 text-sm text-slate-500 justify-center">
-          <span className="flex items-center"><FileType className="w-4 h-4 mr-1"/> HEIC</span>
-          <span className="flex items-center"><FileType className="w-4 h-4 mr-1"/> HEVC</span>
-          <span className="flex items-center"><FileType className="w-4 h-4 mr-1"/> MOV</span>
+        <div className="flex flex-wrap gap-3 mt-4 text-xs justify-center">
+          {badges.map(b => (
+            <span key={b.label} className={`flex items-center ${b.color}`}>
+              <FileType className="w-3 h-3 mr-1"/> {b.label}
+            </span>
+          ))}
         </div>
       </div>
     </motion.div>
@@ -98,3 +132,5 @@ const UploadBox = ({ onFilesSelected }) => {
 };
 
 export default UploadBox;
+
+
