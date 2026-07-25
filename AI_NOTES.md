@@ -143,3 +143,10 @@ You can now open your browser to http://localhost:5173 and test out the full con
 - **Root README.md**: Created root `README.md` detailing features, tech stack, prerequisites, API reference, and 3 server start options (Windows start.bat, npm scripts, manual step-by-step).
 - **Root package.json**: Added `start:backend`, `start:frontend`, and `start` npm scripts.
 - **GitHub Sync**: Committed changes and pushed to remote `origin/main` (https://github.com/pranav-6944/Media_Morph.git).
+
+---
+
+## Bug Fix: "Input file is missing" Error (2026-07-25)
+- **Root Cause**: In `App.jsx`, `handleConvertAll` matched uploaded backend files to frontend items using `res.data.files.find(u => u.originalName.toLowerCase() === f.file.name.toLowerCase())`. `find()` returned the FIRST uploaded file (`res.data.files[0]`) for ALL items in the batch upload with matching names or when multiple files were uploaded. This caused duplicate job triggers for the same `fileId`. Job 1 succeeded and deleted the upload in `finally`; Job 2 then ran on the same `fileId` and failed with `Input file is missing`.
+- **Fix in `App.jsx`**: Replaced `res.data.files.find(...)` with a strict index-based map (`uploadMap.set(f.id, res.data.files[idx])`) since `FormData` appends items in `idle` index order. Also updated `handleFormatChange` to reset status to `idle` and clear `fileId`/`jobId` when target format changes.
+- **Fix in `backend/routes/convert.js`**: Added explicit `fs.existsSync(inputPath)` check inside `processFile` to surface a clear error message if an upload file is missing before conversion starts.

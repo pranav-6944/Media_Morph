@@ -136,6 +136,10 @@ async function processFile({ inputPath, outPath, outFmt, originalName, jobId, is
     const setProgress = (p) => conversionJobs.set(jobId, { status: 'processing', progress: Math.min(Math.floor(p), 99) });
 
     try {
+        if (!fs.existsSync(inputPath)) {
+            throw new Error(`Input file "${path.basename(inputPath)}" was not found on server or was already cleaned up.`);
+        }
+
         // Determine the input category from the ORIGINAL filename (not the temp upload name)
         const origExt  = path.extname(originalName).toLowerCase();
         const isHeic   = HEIC_EXTS.has(origExt);

@@ -291,7 +291,7 @@ function Home() {
   };
 
   const handleFormatChange = (id, fmt) =>
-    setFiles(prev => prev.map(f => f.id === id ? { ...f, targetFormat: fmt } : f));
+    setFiles(prev => prev.map(f => f.id === id ? { ...f, targetFormat: fmt, status: 'idle', fileId: null, jobId: null, errorMsg: null } : f));
 
   const handleRemove = async (id) => {
     const file = files.find(f => f.id === id);
@@ -312,12 +312,18 @@ function Home() {
         const pct = Math.round((pe.loaded * 100) / pe.total);
         setFiles(prev => prev.map(f => idle.find(x => x.id === f.id) ? { ...f, progress: pct } : f));
       });
+
+      // Build 1-to-1 index-based mapping between idle list and uploaded files response
+      const uploadMap = new Map();
+      idle.forEach((f, idx) => {
+        if (res.data?.files && res.data.files[idx]) {
+          uploadMap.set(f.id, res.data.files[idx]);
+        }
+      });
+
       let cnt = 1;
       setFiles(prev => prev.map(f => {
-        // Case-insensitive match so 'Photo.PNG' matches 'photo.png'
-        const up = res.data.files.find(u =>
-          u.originalName.toLowerCase() === f.file.name.toLowerCase()
-        );
+        const up = uploadMap.get(f.id);
         if (up && f.status === 'uploading') {
           const base = batchPrefix.trim()
             ? `${batchPrefix.trim()}_${String(cnt++).padStart(3, '0')}`
