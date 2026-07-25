@@ -1,4 +1,13 @@
 {
+  "name": "media-morph",
+  "version": "1.0.0",
+  "description": "MediaMorph - High-performance Image, Video & Audio Converter",
+  "main": "backend/server.js",
+  "scripts": {
+    "start:backend": "cd backend && node server.js",
+    "start:frontend": "cd frontend && npm run dev",
+    "start": "start.bat"
+  },
   "dependencies": {
     "autoprefixer": "^10.4.27",
     "axios": "^1.13.6",

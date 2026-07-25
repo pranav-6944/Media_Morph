@@ -132,3 +132,14 @@ Root/
 - FormatSelector.jsx — add isAudio prop, audio format options
 - UploadBox.jsx — expand accept types to include audio/image extensions
 - FileList.jsx — add 3rd badge style (orange) for audio files
+
+Backend (node server.js) is running on http://localhost:5000
+Frontend (npm run dev) is running on http://localhost:5173
+You can now open your browser to http://localhost:5173 and test out the full conversion suite (images, videos, and audio).
+
+---
+
+## Server Start & Repository Updates (2026-07-25)
+- **Root README.md**: Created root `README.md` detailing features, tech stack, prerequisites, API reference, and 3 server start options (Windows start.bat, npm scripts, manual step-by-step).
+- **Root package.json**: Added `start:backend`, `start:frontend`, and `start` npm scripts.
+- **GitHub Sync**: Committed changes and pushed to remote `origin/main` (https://github.com/pranav-6944/Media_Morph.git).
