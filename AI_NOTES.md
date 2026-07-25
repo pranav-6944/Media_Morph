@@ -147,6 +147,6 @@ You can now open your browser to http://localhost:5173 and test out the full con
 ---
 
 ## Bug Fix: "Input file is missing" Error (2026-07-25)
-- **Root Cause**: In `App.jsx`, `startJob(...)` (an async HTTP POST request) was being invoked inside `setFiles(prev => prev.map(...))` state updater function. In React 18/19 (especially in StrictMode / concurrent rendering), functional `setState` updaters can be executed twice by React, causing `startJob` to be called TWICE 4ms apart for the same uploaded `fileId`. Job 1 succeeded and deleted the upload in `finally`; Job 2 ran 4ms later on the same `fileId` and failed because Job 1 had already unlinked the input file.
-- **Fix in `App.jsx`**: Extracted `startJob` completely out of `setFiles(prev => ...)` into a `jobsToStart` array and executed `startJob` in a plain `for...of` loop AFTER `setFiles`.
+- **Root Cause & Stuck in Processing Fix**: In `App.jsx`, `jobsToStart.push(...)` was initially placed inside `setFiles(prev => ...)` callback. Because React 18/19 schedules state updater callbacks asynchronously, `jobsToStart` remained an empty array (`[]`) when the subsequent synchronous `for (const job of jobsToStart)` loop executed. `startJob` was never called, leaving the UI state stuck in `status: 'processing'`.
+- **Fix in `App.jsx`**: Refactored `handleConvertAll` to build `jobsToStart` and state updates synchronously directly from `idle` and `res.data.files` in the main call stack before dispatching `setFiles` and `startJob`.
 - **Fix in `backend/routes/convert.js`**: Added a duplicate queue guard (`jobQueue.some(j => j.inputPath === inputPath)`) to reject any duplicate conversion requests for the same input file with an HTTP 400.

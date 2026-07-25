@@ -320,13 +320,13 @@ function Home() {
 
       const uploadedFiles = res.data?.files || [];
       const jobsToStart = [];
+      const updatedMap = new Map();
       let cnt = 1;
 
-      // 3. Purely update React state & collect jobs to start (NO side effects inside setFiles!)
-      setFiles(prev => prev.map(f => {
-        const idleIdx = idle.findIndex(x => x.id === f.id);
-        if (idleIdx !== -1 && uploadedFiles[idleIdx]) {
-          const up = uploadedFiles[idleIdx];
+      // 3. Build jobs & state updates synchronously in current call stack
+      idle.forEach((f, idx) => {
+        if (uploadedFiles[idx]) {
+          const up = uploadedFiles[idx];
           const base = batchPrefix.trim()
             ? `${batchPrefix.trim()}_${String(cnt++).padStart(3, '0')}`
             : f.file.name.replace(/\.[^.]+$/, '');
@@ -339,15 +339,27 @@ function Home() {
             base: base
           });
 
-          return { ...f, status: 'processing', progress: 0, fileId: up.id, startTime: Date.now() };
+          updatedMap.set(f.id, {
+            status: 'processing',
+            progress: 0,
+            fileId: up.id,
+            startTime: Date.now()
+          });
+        } else {
+          updatedMap.set(f.id, {
+            status: 'failed',
+            errorMsg: 'Upload mapping failed — try again'
+          });
         }
-        if (f.status === 'uploading') {
-          return { ...f, status: 'failed', errorMsg: 'Upload mapping failed — try again' };
-        }
-        return f;
+      });
+
+      // 4. Update React state with calculated updates
+      setFiles(prev => prev.map(f => {
+        const update = updatedMap.get(f.id);
+        return update ? { ...f, ...update } : f;
       }));
 
-      // 4. Trigger startJob for each uploaded file cleanly outside of setState
+      // 5. Trigger startJob for each uploaded file cleanly
       for (const job of jobsToStart) {
         startJob(job.localId, job.backendId, job.origName, job.format, job.base);
       }
