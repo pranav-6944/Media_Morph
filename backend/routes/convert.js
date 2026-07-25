@@ -66,6 +66,12 @@ router.post('/', async (req, res) => {
             return res.status(404).json({ error: 'Uploaded file not found on server' });
         }
 
+        // Prevent duplicate queueing of the exact same input file
+        const isAlreadyQueued = jobQueue.some(j => j.inputPath === inputPath);
+        if (isAlreadyQueued) {
+            return res.status(400).json({ error: 'File is already in queue for conversion' });
+        }
+
         // Normalise output format (mp4_compressed → mp4)
         const outFmt = outputFormat.toLowerCase().replace('_compressed', '');
 

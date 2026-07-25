@@ -304,42 +304,57 @@ function Home() {
   const handleConvertAll = async () => {
     const idle = files.filter(f => f.status === 'idle');
     if (!idle.length) return;
+
     const fd = new FormData();
     idle.forEach(f => fd.append('files', f.file));
+
     try {
-      setFiles(prev => prev.map(f => idle.find(x => x.id === f.id) ? { ...f, status: 'uploading' } : f));
+      // 1. Mark files as uploading
+      setFiles(prev => prev.map(f => idle.some(x => x.id === f.id) ? { ...f, status: 'uploading', progress: 0 } : f));
+
+      // 2. Upload files to backend
       const res = await uploadFiles(fd, pe => {
         const pct = Math.round((pe.loaded * 100) / pe.total);
-        setFiles(prev => prev.map(f => idle.find(x => x.id === f.id) ? { ...f, progress: pct } : f));
+        setFiles(prev => prev.map(f => idle.some(x => x.id === f.id) ? { ...f, progress: pct } : f));
       });
 
-      // Build 1-to-1 index-based mapping between idle list and uploaded files response
-      const uploadMap = new Map();
-      idle.forEach((f, idx) => {
-        if (res.data?.files && res.data.files[idx]) {
-          uploadMap.set(f.id, res.data.files[idx]);
-        }
-      });
-
+      const uploadedFiles = res.data?.files || [];
+      const jobsToStart = [];
       let cnt = 1;
+
+      // 3. Purely update React state & collect jobs to start (NO side effects inside setFiles!)
       setFiles(prev => prev.map(f => {
-        const up = uploadMap.get(f.id);
-        if (up && f.status === 'uploading') {
+        const idleIdx = idle.findIndex(x => x.id === f.id);
+        if (idleIdx !== -1 && uploadedFiles[idleIdx]) {
+          const up = uploadedFiles[idleIdx];
           const base = batchPrefix.trim()
             ? `${batchPrefix.trim()}_${String(cnt++).padStart(3, '0')}`
             : f.file.name.replace(/\.[^.]+$/, '');
-          startJob(f.id, up.id, f.file.name, f.targetFormat, base);
+
+          jobsToStart.push({
+            localId: f.id,
+            backendId: up.id,
+            origName: f.file.name,
+            format: f.targetFormat,
+            base: base
+          });
+
           return { ...f, status: 'processing', progress: 0, fileId: up.id, startTime: Date.now() };
         }
         if (f.status === 'uploading') {
-          // File was uploaded but backend name didn't match — flag it
           return { ...f, status: 'failed', errorMsg: 'Upload mapping failed — try again' };
         }
         return f;
       }));
+
+      // 4. Trigger startJob for each uploaded file cleanly outside of setState
+      for (const job of jobsToStart) {
+        startJob(job.localId, job.backendId, job.origName, job.format, job.base);
+      }
+
     } catch (err) {
       const msg = err?.response?.data?.error || err?.message || 'Upload failed';
-      setFiles(prev => prev.map(f => idle.find(x => x.id === f.id) ? { ...f, status: 'failed', progress: 0, errorMsg: msg } : f));
+      setFiles(prev => prev.map(f => idle.some(x => x.id === f.id) ? { ...f, status: 'failed', progress: 0, errorMsg: msg } : f));
     }
   };
 
