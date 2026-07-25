@@ -132,6 +132,20 @@ Media_Morph/
 
 ---
 
+## 🌐 Deploying to Render.com
+
+MediaMorph includes a pre-configured `render.yaml` Blueprint file for automatic 1-click deployment on Render.
+
+### Option 1: Render Blueprint (Automatic 1-Click Setup)
+1. Push your latest code to your GitHub repository (`https://github.com/pranav-6944/Media_Morph.git`).
+2. Log in to [Render Dashboard](https://dashboard.render.com/).
+3. Click **New +** $\rightarrow$ **Blueprint**.
+4. Connect your GitHub repository.
+5. Render will automatically detect `render.yaml` and provision both **Backend Web Service** and **Frontend Static Site**.
+6. Click **Apply**.
+
+---
+
 ## 📄 License
 
 This project is licensed under the ISC License.
