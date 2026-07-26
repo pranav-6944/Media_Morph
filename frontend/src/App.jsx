@@ -409,9 +409,17 @@ function Home() {
       }
 
     } catch (err) {
-      const msg = err?.response?.data?.error || err?.message || 'Upload failed';
       console.error('Upload Error:', err);
-      setFiles(prev => prev.map(f => idle.some(x => x.id === f.id) ? { ...f, status: 'failed', progress: 0, errorMsg: msg } : f));
+      const status = err?.response?.status;
+      const respData = err?.response?.data;
+      const serverMsg = respData?.error 
+                     || respData?.message
+                     || (typeof respData === 'string' ? respData.slice(0, 120) : null)
+                     || err?.message 
+                     || 'Upload failed';
+
+      const fullErr = status ? `[HTTP ${status}] ${serverMsg}` : serverMsg;
+      setFiles(prev => prev.map(f => idle.some(x => x.id === f.id) ? { ...f, status: 'failed', progress: 0, errorMsg: fullErr } : f));
     }
   };
 
@@ -432,15 +440,22 @@ function Home() {
       const cleanName = resData?.cleanName;
 
       if (!jobId) {
-        throw new Error(resData?.error || 'Conversion request failed');
+        throw new Error(resData?.error || 'Conversion request failed: No jobId returned');
       }
 
       setFiles(prev => prev.map(f => f.id === localId ? { ...f, jobId, outFileName, cleanName } : f));
       pollStatus(localId, jobId);
     } catch (err) {
-      const msg = err?.response?.data?.error || err?.message || 'Conversion request failed';
-      console.error('[startJob] error:', msg, err);
-      setFiles(prev => prev.map(f => f.id === localId ? { ...f, status: 'failed', errorMsg: msg } : f));
+      const status = err?.response?.status;
+      const respData = err?.response?.data;
+      const serverMsg = respData?.error 
+                     || respData?.message
+                     || (typeof respData === 'string' ? respData.slice(0, 120) : null)
+                     || err?.message 
+                     || 'Conversion request failed';
+      const fullErr = status ? `[HTTP ${status}] ${serverMsg}` : serverMsg;
+      console.error('[startJob] error:', fullErr, err);
+      setFiles(prev => prev.map(f => f.id === localId ? { ...f, status: 'failed', errorMsg: fullErr } : f));
     }
   };
 
