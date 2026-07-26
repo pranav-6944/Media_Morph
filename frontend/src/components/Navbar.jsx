@@ -61,7 +61,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <button 
             onClick={toggleTheme}
-            className="p-2 rounded-lg btn-ghost flex items-center justify-center transition-colors"
+            className="hidden md:flex p-2 rounded-lg btn-ghost items-center justify-center transition-colors"
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
             {theme === 'light' ? <Sun className="w-4 h-4 gold-text" /> : <Moon className="w-4 h-4 gold-text" />}
@@ -91,23 +91,7 @@ export default function Navbar() {
                   {l.label}
                 </a>
               ))}
-              
-              {/* Dark/Light mode switcher inside mobile hamburger */}
-              <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: 'color-mix(in srgb, var(--gold) calc(100% * .15), transparent)' }}>
-                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--muted)' }}>
-                  Theme Mode
-                </span>
-                <button 
-                  onClick={toggleTheme}
-                  className="btn btn-ghost text-xs px-3 py-1.5 flex items-center gap-2"
-                >
-                  {theme === 'light' ? (
-                    <><Sun className="w-4 h-4 gold-text" /> Light Mode</>
-                  ) : (
-                    <><Moon className="w-4 h-4 gold-text" /> Dark Mode</>
-                  )}
-                </button>
-              </div>
+
 
               <a href="/#converter" onClick={() => setMenuOpen(false)} className="btn btn-gold" style={{ padding: '10px 18px', fontSize: 13, justifyContent: 'center' }}>
                 Convert Free
