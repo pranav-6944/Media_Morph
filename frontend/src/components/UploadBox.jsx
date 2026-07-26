@@ -85,10 +85,10 @@ export default function UploadBox({ onFilesSelected }) {
         </div>
 
         {/* Format groups */}
-        <div className="flex justify-center gap-6 flex-wrap">
+        <div className="flex flex-col items-center gap-3 sm:gap-4">
           {FORMAT_GROUPS.map(g => (
-            <div key={g.label} className="flex items-center gap-2">
-              <span className="text-xs muted-text font-medium">{g.label}:</span>
+            <div key={g.label} className="flex items-center justify-center gap-2 flex-wrap">
+              <span className="text-xs muted-text font-medium shrink-0">{g.label}:</span>
               {g.formats.map(f => (
                 <span key={f} className={`badge ${g.cls}`}>{f}</span>
               ))}
