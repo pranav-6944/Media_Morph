@@ -25,6 +25,7 @@ services:
         fromService:
           type: web
           name: mediamorph-backend
-          property: hostpath
+          property: host
+        prefix: https://
         suffix: /api
 
