@@ -69,7 +69,7 @@ router.post('/', (req, res) => {
             mimetype: file.mimetype
         }));
 
-        res.json({ message: 'Files uploaded successfully', files: filesData });
+        res.json({ message: 'Files uploaded successfully', files: filesData, uploadedFiles: filesData });
     });
 });
 

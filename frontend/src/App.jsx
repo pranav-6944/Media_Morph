@@ -323,10 +323,22 @@ function Home() {
         try { resData = JSON.parse(resData); } catch (e) {}
       }
 
-      const uploadedFiles = resData?.files || [];
+      console.log('[MediaMorph] Raw Upload Response:', resData);
+
+      // Multi-format normalization: handle Array, { files: [] }, { uploadedFiles: [] }, { data: [] }, or single Object
+      const uploadedFiles = Array.isArray(resData) 
+        ? resData 
+        : (Array.isArray(resData?.files) 
+            ? resData.files 
+            : (Array.isArray(resData?.uploadedFiles)
+                ? resData.uploadedFiles
+                : (Array.isArray(resData?.data) 
+                    ? resData.data 
+                    : (resData?.id || resData?.filename ? [resData] : []))));
 
       if (!resData || !Array.isArray(uploadedFiles) || uploadedFiles.length === 0) {
         const serverError = resData?.error 
+                         || resData?.message
                          || (typeof resData === 'string' ? resData.slice(0, 100) : null) 
                          || 'Upload failed: Server did not return file data';
         throw new Error(serverError);
@@ -341,7 +353,7 @@ function Home() {
         const targetClean = (f.file.name || '').trim().toLowerCase();
         
         // Flexible lookup: match by originalName, clean string match, index fallback, or single file fallback
-        const up = uploadedFiles.find(u => u.originalName && u.originalName.trim().toLowerCase() === targetClean)
+        const up = uploadedFiles.find(u => u && u.originalName && u.originalName.trim().toLowerCase() === targetClean)
                 || uploadedFiles[idx]
                 || (uploadedFiles.length === 1 ? uploadedFiles[0] : null);
 
@@ -400,7 +412,18 @@ function Home() {
         originalName: origName,
         finalBaseName: base,
       });
-      const { jobId, outFileName, cleanName } = res.data;
+      let resData = res?.data;
+      if (typeof resData === 'string') {
+        try { resData = JSON.parse(resData); } catch (e) {}
+      }
+      const jobId = resData?.jobId;
+      const outFileName = resData?.outFileName;
+      const cleanName = resData?.cleanName;
+
+      if (!jobId) {
+        throw new Error(resData?.error || 'Conversion request failed');
+      }
+
       setFiles(prev => prev.map(f => f.id === localId ? { ...f, jobId, outFileName, cleanName } : f));
       pollStatus(localId, jobId);
     } catch (err) {
