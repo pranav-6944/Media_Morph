@@ -22,10 +22,5 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: mediamorph-backend
-          property: host
-        prefix: https://
-        suffix: /api
+        value: https://mediamorph-backend.onrender.com/api
 
