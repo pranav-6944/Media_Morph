@@ -80,6 +80,7 @@ Root/
 - **Axios FormData Boundary Fix**: Removed manual `Content-Type: multipart/form-data` header in `api.js` which stripped browser `boundary=...` parameter and caused Multer to return 0 files.
 - **Auto JSON & Array Normalization**: `App.jsx` handles `resData` whether returned as raw Array `[...]`, `{ files: [] }`, `{ uploadedFiles: [] }`, or single Object `{ id: ... }`. `upload.js` sends both `files` and `uploadedFiles` keys.
 - **Blob Validation & upload.any**: `App.jsx` verifies `instanceof File/Blob` before `fd.append` with explicit filename, and `upload.js` uses `upload.any()` for universal field acceptance across mobile and desktop browsers.
+- **Detailed HTTP Error Surfacing**: `App.jsx` prefixes `[HTTP status_code]` and exact server response bodies in card error messages for instant diagnostic visibility.
 - **Default Light Theme**: Light mode (#F5F2EE) set as default first. Dark mode togglable via `data-theme="dark"`.
 - **Hamburger Menu Theme Switcher**: Placed Dark/Light Mode toggle inside `Navbar.jsx` mobile menu.
 - **Compact Mobile Footer**: Refactored `Footer` links grid into a 2-column list per category on mobile screens, reducing vertical scroll height by ~75% while keeping all 36 links.
