@@ -77,6 +77,7 @@ Root/
   2. `server.js` set `helmet({ crossOriginResourcePolicy: false })` to allow cross-origin uploads between Render frontend and backend.
   3. `App.jsx` added multi-tier fallback mapping (case-insensitive filename match, index match, single-file match fallback) and surfaces exact server errors if upload fails.
 - **Production API URL & Verification**: `api.js` automatically resolves `https://mediamorph-backend.onrender.com/api` and verifies JSON responses to prevent SPA HTML rewrites. Added `/api/health` in `server.js`.
+- **Axios FormData Boundary Fix**: Removed manual `Content-Type: multipart/form-data` header in `api.js` which stripped browser `boundary=...` parameter and caused Multer to return 0 files.
 - **Default Light Theme**: Light mode (#F5F2EE) set as default first. Dark mode togglable via `data-theme="dark"`.
 - **Hamburger Menu Theme Switcher**: Placed Dark/Light Mode toggle inside `Navbar.jsx` mobile menu.
 - **Compact Mobile Footer**: Refactored `Footer` links grid into a 2-column list per category on mobile screens, reducing vertical scroll height by ~75% while keeping all 36 links.
