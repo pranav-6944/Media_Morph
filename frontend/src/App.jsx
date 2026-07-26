@@ -319,21 +319,35 @@ function Home() {
       });
 
       const uploadedFiles = res.data?.files || [];
+
+      if (!res.data || !Array.isArray(uploadedFiles) || uploadedFiles.length === 0) {
+        const serverError = res.data?.error || 'Upload failed: Server did not return file data';
+        throw new Error(serverError);
+      }
+
       const jobsToStart = [];
       const updatedMap = new Map();
       let cnt = 1;
 
       // 3. Build jobs & state updates synchronously in current call stack
       idle.forEach((f, idx) => {
-        const up = uploadedFiles.find(u => u.originalName === f.file.name) || uploadedFiles[idx];
-        if (up) {
+        const targetClean = (f.file.name || '').trim().toLowerCase();
+        
+        // Flexible lookup: match by originalName, clean string match, index fallback, or single file fallback
+        const up = uploadedFiles.find(u => u.originalName && u.originalName.trim().toLowerCase() === targetClean)
+                || uploadedFiles[idx]
+                || (uploadedFiles.length === 1 ? uploadedFiles[0] : null);
+
+        const backendFileId = up?.id || up?.filename;
+
+        if (up && backendFileId) {
           const base = batchPrefix.trim()
             ? `${batchPrefix.trim()}_${String(cnt++).padStart(3, '0')}`
             : f.file.name.replace(/\.[^.]+$/, '');
 
           jobsToStart.push({
             localId: f.id,
-            backendId: up.id,
+            backendId: backendFileId,
             origName: f.file.name,
             format: f.targetFormat,
             base: base
@@ -342,13 +356,13 @@ function Home() {
           updatedMap.set(f.id, {
             status: 'processing',
             progress: 0,
-            fileId: up.id,
+            fileId: backendFileId,
             startTime: Date.now()
           });
         } else {
           updatedMap.set(f.id, {
             status: 'failed',
-            errorMsg: 'Upload mapping failed — try again'
+            errorMsg: 'File processing error — please try re-adding file'
           });
         }
       });
@@ -366,6 +380,7 @@ function Home() {
 
     } catch (err) {
       const msg = err?.response?.data?.error || err?.message || 'Upload failed';
+      console.error('Upload Error:', err);
       setFiles(prev => prev.map(f => idle.some(x => x.id === f.id) ? { ...f, status: 'failed', progress: 0, errorMsg: msg } : f));
     }
   };

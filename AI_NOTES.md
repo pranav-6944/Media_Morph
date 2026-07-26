@@ -72,7 +72,10 @@ Root/
 
 ## Render & Mobile Bugfixes (2026-07-26)
 - **Analytics Dashboard**: Added safe null/undefined guards in `Analytics.jsx` & `stats.js` so missing/empty stats don't crash React to a black screen.
-- **Upload Mapping Fix**: `upload.js` wrapped in multer error callback (max 50 files). `App.jsx` matches uploaded files by `originalName` first to prevent `Upload mapping failed`.
+- **Upload Mapping Resolution**:
+  1. `upload.js` ensures `uploads/` directory exists dynamically before Multer disk write.
+  2. `server.js` set `helmet({ crossOriginResourcePolicy: false })` to allow cross-origin uploads between Render frontend and backend.
+  3. `App.jsx` added multi-tier fallback mapping (case-insensitive filename match, index match, single-file match fallback) and surfaces exact server errors if upload fails.
 - **Default Light Theme**: Light mode (#F5F2EE) set as default first. Dark mode togglable via `data-theme="dark"`.
 - **Hamburger Menu Theme Switcher**: Placed Dark/Light Mode toggle inside `Navbar.jsx` mobile menu.
 - **Compact Mobile Footer**: Refactored `Footer` links grid into a 2-column list per category on mobile screens, reducing vertical scroll height by ~75% while keeping all 36 links.
