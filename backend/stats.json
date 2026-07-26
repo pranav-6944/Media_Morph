@@ -1,1 +1,8 @@
-{"totalConversions":0,"byFormat":{}}
+{
+  "totalConversions": 7,
+  "byFormat": {
+    "avif": 3,
+    "jpg": 3,
+    "gif": 1
+  }
+}

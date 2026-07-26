@@ -63,9 +63,14 @@ Root/
 - `heic-helper.js:10` — convertHeic function
 - `ffmpeg-helper.js:7` — convertVideo function
 
+## Render Deployment Context
+- `render.yaml`: Contains multi-service configuration for Render Blueprint (backend Web Service + frontend Static Site)
+- `VITE_API_URL`: Points frontend API client to backend URL (`https://<backend-url>/api`)
+- FFmpeg/Sharp: Compatible with Render Linux x64 environment via `@ffmpeg-installer/ffmpeg` & `sharp` prebuilt binaries.
+
 ---
 
-## Current Status (as of 2026-07-20)
+## Current Status (as of 2026-07-26)
 - **Core functionality**: ✅ Working — upload, convert, download all implemented
 - **Missing**: No AI_NOTES.md existed before this session
 
