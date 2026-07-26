@@ -2,7 +2,7 @@ services:
   # Backend Express Web Service
   - type: web
     name: mediamorph-backend
-    env: node
+    runtime: node
     plan: free
     buildCommand: cd backend && npm install
     startCommand: cd backend && node server.js
@@ -11,8 +11,9 @@ services:
         value: 10000
 
   # Frontend React Static Site
-  - type: static
+  - type: web
     name: mediamorph-frontend
+    runtime: static
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: ./frontend/dist
     routes:
@@ -26,3 +27,4 @@ services:
           name: mediamorph-backend
           property: hostpath
         suffix: /api
+
