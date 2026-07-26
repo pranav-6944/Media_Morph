@@ -318,10 +318,17 @@ function Home() {
         setFiles(prev => prev.map(f => idle.some(x => x.id === f.id) ? { ...f, progress: pct } : f));
       });
 
-      const uploadedFiles = res.data?.files || [];
+      let resData = res?.data;
+      if (typeof resData === 'string') {
+        try { resData = JSON.parse(resData); } catch (e) {}
+      }
 
-      if (!res.data || !Array.isArray(uploadedFiles) || uploadedFiles.length === 0) {
-        const serverError = res.data?.error || 'Upload failed: Server did not return file data';
+      const uploadedFiles = resData?.files || [];
+
+      if (!resData || !Array.isArray(uploadedFiles) || uploadedFiles.length === 0) {
+        const serverError = resData?.error 
+                         || (typeof resData === 'string' ? resData.slice(0, 100) : null) 
+                         || 'Upload failed: Server did not return file data';
         throw new Error(serverError);
       }
 

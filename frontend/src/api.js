@@ -17,21 +17,30 @@ export const API_URL = getApiUrl();
 console.log('[MediaMorph] Connected API_URL:', API_URL);
 
 const checkJsonResponse = (res) => {
-  if (typeof res.data === 'string' && (res.data.includes('<!DOCTYPE html>') || res.data.includes('<html'))) {
-    throw new Error(`Backend URL Error: Reached HTML page at ${API_URL}. Ensure backend Web Service "mediamorph-backend" is deployed and running on Render.`);
+  if (typeof res.data === 'string') {
+    if (res.data.includes('<!DOCTYPE html>') || res.data.includes('<html')) {
+      throw new Error(`Backend URL Error: Reached HTML page at ${API_URL}. Ensure backend Web Service "mediamorph-backend" is deployed and running on Render.`);
+    }
+    try {
+      res.data = JSON.parse(res.data);
+    } catch (e) {
+      console.warn('[MediaMorph] Response data is string, could not parse JSON:', res.data);
+    }
   }
   return res;
 };
 
 export const uploadFiles = async (formData, onUploadProgress) => {
   const res = await axios.post(`${API_URL}/upload`, formData, {
+    responseType: 'json',
     onUploadProgress
   });
   return checkJsonResponse(res);
 };
 
-export const startConversion = (data) => {
-  return axios.post(`${API_URL}/convert`, data);
+export const startConversion = async (data) => {
+  const res = await axios.post(`${API_URL}/convert`, data, { responseType: 'json' });
+  return checkJsonResponse(res);
 };
 
 export const checkJobStatus = (jobId) => {
