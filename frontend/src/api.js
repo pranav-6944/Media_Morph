@@ -25,7 +25,6 @@ const checkJsonResponse = (res) => {
 
 export const uploadFiles = async (formData, onUploadProgress) => {
   const res = await axios.post(`${API_URL}/upload`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress
   });
   return checkJsonResponse(res);
