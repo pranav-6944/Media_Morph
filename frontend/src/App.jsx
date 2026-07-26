@@ -306,7 +306,19 @@ function Home() {
     if (!idle.length) return;
 
     const fd = new FormData();
-    idle.forEach(f => fd.append('files', f.file));
+    let appendedCount = 0;
+    idle.forEach(f => {
+      const fileBlob = f.file || f.rawFile;
+      if (fileBlob && (fileBlob instanceof File || fileBlob instanceof Blob)) {
+        fd.append('files', fileBlob, f.file?.name || fileBlob.name || 'upload.bin');
+        appendedCount++;
+      }
+    });
+
+    if (appendedCount === 0) {
+      alert('Selected file reference was lost. Please re-select your file.');
+      return;
+    }
 
     try {
       // 1. Mark files as uploading
@@ -338,7 +350,6 @@ function Home() {
 
       if (!resData || !Array.isArray(uploadedFiles) || uploadedFiles.length === 0) {
         const serverError = resData?.error 
-                         || resData?.message
                          || (typeof resData === 'string' ? resData.slice(0, 100) : null) 
                          || 'Upload failed: Server did not return file data';
         throw new Error(serverError);

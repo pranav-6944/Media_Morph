@@ -52,13 +52,14 @@ const upload = multer({
 });
 
 router.post('/', (req, res) => {
-    upload.array('files', 50)(req, res, (err) => {
+    upload.any()(req, res, (err) => {
         if (err) {
             console.error('Upload Error:', err);
             return res.status(400).json({ error: err.message || 'Error uploading files' });
         }
         if (!req.files || req.files.length === 0) {
-            return res.status(400).json({ error: 'No files uploaded' });
+            console.error('No files found in req.files');
+            return res.status(400).json({ error: 'No file binary data received by server. Please re-select the file.' });
         }
         
         const filesData = req.files.map(file => ({
