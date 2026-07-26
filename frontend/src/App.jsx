@@ -221,16 +221,16 @@ function Footer() {
           </div>
 
           {/* Format links grid */}
-          <div className="flex-1 grid sm:grid-cols-3 gap-10">
+          <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10">
             {Object.entries(FOOTER_LINKS).map(([cat, links]) => (
               <div key={cat}>
-                <h4 className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: 'var(--gold)' }}>
+                <h4 className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: 'var(--gold)' }}>
                   {cat}
                 </h4>
-                <ul className="space-y-2">
+                <ul className="grid grid-cols-2 sm:grid-cols-1 gap-x-3 gap-y-1.5">
                   {links.map(link => (
                     <li key={link}>
-                      <a href="/#converter" className="footer-link block">{link}</a>
+                      <a href="/#converter" className="footer-link block text-xs">{link}</a>
                     </li>
                   ))}
                 </ul>
@@ -325,8 +325,8 @@ function Home() {
 
       // 3. Build jobs & state updates synchronously in current call stack
       idle.forEach((f, idx) => {
-        if (uploadedFiles[idx]) {
-          const up = uploadedFiles[idx];
+        const up = uploadedFiles.find(u => u.originalName === f.file.name) || uploadedFiles[idx];
+        if (up) {
           const base = batchPrefix.trim()
             ? `${batchPrefix.trim()}_${String(cnt++).padStart(3, '0')}`
             : f.file.name.replace(/\.[^.]+$/, '');

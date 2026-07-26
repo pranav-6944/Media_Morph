@@ -8,38 +8,34 @@
    Palette: Obsidian · Champagne Gold · Warm Cream · Dusty Rose
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 :root {
-  /* Default Dark Mode */
+  /* Default Light Mode */
 
   /* Backgrounds */
-  --bg:        #09080F;
-  --bg-1:      #0E0D1B;
-  --bg-2:      #141328;
-  --bg-3:      #1A1930;
+  --bg:        #F5F2EE;
+  --bg-1:      #FFFFFF;
+  --bg-2:      #F0ECE4;
+  --bg-3:      #E8E2D8;
 
   /* Gold spectrum */
-  --gold:      #C09A5F;
-  --gold-lt:   #D4B27A;
-  --gold-dim:  #7A6035;
-  --gold-faint:color-mix(in srgb, var(--gold) calc(100% * .08), transparent);
+  --gold:      #A87A3E;
+  --gold-lt:   #C09A5F;
+  --gold-dim:  #876231;
+  --gold-faint:rgba(168,122,62,.08);
 
   /* Typography */
-  --cream:     #EAE0CE;
-  --muted:     #7A7065;
-  --dim:       #3A3430;
+  --cream:     #2A2825;
+  --muted:     #6D665E;
+  --dim:       #A39E97;
 
   /* Semantics */
-  --success:   #6E9E7E;
+  --success:   #4CAF80;
   --error:     #A06055;
 
-  /* Shadows — warm obsidian */
-  --sh-sm: 0 2px 6px rgba(0,0,0,.5), 0 8px 20px rgba(0,0,0,.4),
-           inset 0 1px 0 color-mix(in srgb, var(--gold) calc(100% * .1), transparent), inset 0 0 0 1px color-mix(in srgb, var(--gold) calc(100% * .05), transparent);
-  --sh-md: 0 4px 12px rgba(0,0,0,.55), 0 20px 48px rgba(0,0,0,.5), 0 40px 80px rgba(0,0,0,.3),
-           inset 0 1px 0 color-mix(in srgb, var(--gold) calc(100% * .12), transparent), inset 0 0 0 1px color-mix(in srgb, var(--gold) calc(100% * .07), transparent);
-  --sh-lg: 0 8px 20px rgba(0,0,0,.6), 0 32px 64px rgba(0,0,0,.5), 0 64px 120px rgba(0,0,0,.35),
-           inset 0 1px 0 color-mix(in srgb, var(--gold) calc(100% * .15), transparent), inset 0 0 0 1px color-mix(in srgb, var(--gold) calc(100% * .08), transparent);
-  --sh-btn:0 2px 4px rgba(0,0,0,.5), 0 8px 24px rgba(0,0,0,.4),
-           inset 0 1px 0 color-mix(in srgb, var(--cream) calc(100% * .08), transparent), inset 0 -1px 3px rgba(0,0,0,.4);
+  /* Shadows */
+  --sh-sm: 0 2px 6px rgba(0,0,0,.04), 0 8px 20px rgba(0,0,0,.03), inset 0 1px 0 color-mix(in srgb, var(--cream) calc(100% * .6), transparent), inset 0 0 0 1px rgba(0,0,0,.02);
+  --sh-md: 0 4px 12px rgba(0,0,0,.05), 0 20px 48px rgba(0,0,0,.04), 0 40px 80px rgba(0,0,0,.03), inset 0 1px 0 color-mix(in srgb, var(--cream) calc(100% * .8), transparent), inset 0 0 0 1px rgba(0,0,0,.03);
+  --sh-lg: 0 8px 20px rgba(0,0,0,.06), 0 32px 64px rgba(0,0,0,.05), 0 64px 120px rgba(0,0,0,.04), inset 0 1px 0 color-mix(in srgb, var(--cream) calc(100% * .9), transparent), inset 0 0 0 1px rgba(0,0,0,.03);
+  --sh-btn:0 2px 4px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06), inset 0 1px 0 color-mix(in srgb, var(--cream) calc(100% * .8), transparent), inset 0 -1px 3px rgba(0,0,0,.05);
 
   --r-sm:  8px;
   --r-md:  14px;
@@ -344,46 +340,31 @@
 .scroll-line { width:1px;height:60px;background:linear-gradient(180deg,color-mix(in srgb, var(--gold) calc(100% * .4), transparent),transparent);margin:0 auto; }
 
 
-/* ── Light Theme Overrides ────────────────────────────────────── */
-:root[data-theme='light'] {
-  --bg:        #F5F2EE;
-  --bg-1:      #FFFFFF;
-  --bg-2:      #F0ECE4;
-  --bg-3:      #E8E2D8;
+/* ── Dark Theme Overrides ────────────────────────────────────── */
+:root[data-theme='dark'] {
+  --bg:        #09080F;
+  --bg-1:      #0E0D1B;
+  --bg-2:      #141328;
+  --bg-3:      #1A1930;
 
-  --gold:      #A87A3E;
-  --gold-lt:   #C09A5F;
-  --gold-dim:  #876231;
-  --gold-faint:rgba(168,122,62,.08);
+  --gold:      #C09A5F;
+  --gold-lt:   #D4B27A;
+  --gold-dim:  #7A6035;
+  --gold-faint:color-mix(in srgb, var(--gold) calc(100% * .08), transparent);
 
-  --cream:     #2A2825;
-  --muted:     #6D665E;
-  --dim:       #A39E97;
-  
-  --sh-sm: 0 2px 6px rgba(0,0,0,.04), 0 8px 20px rgba(0,0,0,.03), inset 0 1px 0 color-mix(in srgb, var(--cream) calc(100% * .6), transparent), inset 0 0 0 1px rgba(0,0,0,.02);
-  --sh-md: 0 4px 12px rgba(0,0,0,.05), 0 20px 48px rgba(0,0,0,.04), 0 40px 80px rgba(0,0,0,.03), inset 0 1px 0 color-mix(in srgb, var(--cream) calc(100% * .8), transparent), inset 0 0 0 1px rgba(0,0,0,.03);
-  --sh-lg: 0 8px 20px rgba(0,0,0,.06), 0 32px 64px rgba(0,0,0,.05), 0 64px 120px rgba(0,0,0,.04), inset 0 1px 0 color-mix(in srgb, var(--cream) calc(100% * .9), transparent), inset 0 0 0 1px rgba(0,0,0,.03);
-  --sh-btn:0 2px 4px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06), inset 0 1px 0 color-mix(in srgb, var(--cream) calc(100% * .8), transparent), inset 0 -1px 3px rgba(0,0,0,.05);
-}
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme='dark']) {
-    --bg:        #F5F2EE;
-    --bg-1:      #FFFFFF;
-    --bg-2:      #F0ECE4;
-    --bg-3:      #E8E2D8;
+  --cream:     #EAE0CE;
+  --muted:     #7A7065;
+  --dim:       #3A3430;
 
-    --gold:      #A87A3E;
-    --gold-lt:   #C09A5F;
-    --gold-dim:  #876231;
-    --gold-faint:rgba(168,122,62,.08);
+  --success:   #6E9E7E;
+  --error:     #A06055;
 
-    --cream:     #2A2825;
-    --muted:     #6D665E;
-    --dim:       #A39E97;
-    
-    --sh-sm: 0 2px 6px rgba(0,0,0,.04), 0 8px 20px rgba(0,0,0,.03), inset 0 1px 0 color-mix(in srgb, var(--cream) calc(100% * .6), transparent), inset 0 0 0 1px rgba(0,0,0,.02);
-    --sh-md: 0 4px 12px rgba(0,0,0,.05), 0 20px 48px rgba(0,0,0,.04), 0 40px 80px rgba(0,0,0,.03), inset 0 1px 0 color-mix(in srgb, var(--cream) calc(100% * .8), transparent), inset 0 0 0 1px rgba(0,0,0,.03);
-    --sh-lg: 0 8px 20px rgba(0,0,0,.06), 0 32px 64px rgba(0,0,0,.05), 0 64px 120px rgba(0,0,0,.04), inset 0 1px 0 color-mix(in srgb, var(--cream) calc(100% * .9), transparent), inset 0 0 0 1px rgba(0,0,0,.03);
-    --sh-btn:0 2px 4px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06), inset 0 1px 0 color-mix(in srgb, var(--cream) calc(100% * .8), transparent), inset 0 -1px 3px rgba(0,0,0,.05);
-  }
+  --sh-sm: 0 2px 6px rgba(0,0,0,.5), 0 8px 20px rgba(0,0,0,.4),
+           inset 0 1px 0 color-mix(in srgb, var(--gold) calc(100% * .1), transparent), inset 0 0 0 1px color-mix(in srgb, var(--gold) calc(100% * .05), transparent);
+  --sh-md: 0 4px 12px rgba(0,0,0,.55), 0 20px 48px rgba(0,0,0,.5), 0 40px 80px rgba(0,0,0,.3),
+           inset 0 1px 0 color-mix(in srgb, var(--gold) calc(100% * .12), transparent), inset 0 0 0 1px color-mix(in srgb, var(--gold) calc(100% * .07), transparent);
+  --sh-lg: 0 8px 20px rgba(0,0,0,.6), 0 32px 64px rgba(0,0,0,.5), 0 64px 120px rgba(0,0,0,.35),
+           inset 0 1px 0 color-mix(in srgb, var(--gold) calc(100% * .15), transparent), inset 0 0 0 1px color-mix(in srgb, var(--gold) calc(100% * .08), transparent);
+  --sh-btn:0 2px 4px rgba(0,0,0,.5), 0 8px 24px rgba(0,0,0,.4),
+           inset 0 1px 0 color-mix(in srgb, var(--cream) calc(100% * .08), transparent), inset 0 -1px 3px rgba(0,0,0,.4);
 }

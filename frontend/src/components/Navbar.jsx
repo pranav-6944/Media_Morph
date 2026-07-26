@@ -12,7 +12,7 @@ const LINKS = [
 export default function Navbar() {
   const [scrolled,  setScrolled]  = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'system');
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 40);
@@ -21,27 +21,12 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (theme === 'system') {
-      localStorage.removeItem('theme');
-      if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-        document.documentElement.setAttribute('data-theme', 'light');
-      } else {
-        document.documentElement.removeAttribute('data-theme');
-      }
-    } else {
-      localStorage.setItem('theme', theme);
-      if (theme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-      } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
-    }
+    localStorage.setItem('theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
-  const cycleTheme = () => {
-    if (theme === 'system') setTheme('light');
-    else if (theme === 'light') setTheme('dark');
-    else setTheme('system');
+  const toggleTheme = () => {
+    setTheme(t => t === 'light' ? 'dark' : 'light');
   };
 
   return (
@@ -72,16 +57,14 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* CTA */}
+        {/* Controls */}
         <div className="flex items-center gap-3">
           <button 
-            onClick={cycleTheme}
+            onClick={toggleTheme}
             className="p-2 rounded-lg btn-ghost flex items-center justify-center transition-colors"
-            title={`Current theme: ${theme}`}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
-            {theme === 'system' && <Monitor className="w-4 h-4 gold-text" />}
-            {theme === 'light' && <Sun className="w-4 h-4 gold-text" />}
-            {theme === 'dark' && <Moon className="w-4 h-4 gold-text" />}
+            {theme === 'light' ? <Sun className="w-4 h-4 gold-text" /> : <Moon className="w-4 h-4 gold-text" />}
           </button>
           <a href="/#converter" className="btn btn-gold hidden sm:flex" style={{ padding: '9px 20px', fontSize: 13 }}>
             Convert Free
@@ -99,7 +82,7 @@ export default function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            style={{ overflow: 'hidden', borderTop: '1px solid rgba(192,154,95,.1)' }}
+            style={{ overflow: 'hidden', borderTop: '1px solid color-mix(in srgb, var(--gold) calc(100% * .15), transparent)' }}
           >
             <div className="px-6 py-4 flex flex-col gap-4">
               {LINKS.map(l => (
@@ -108,7 +91,25 @@ export default function Navbar() {
                   {l.label}
                 </a>
               ))}
-              <a href="/#converter" className="btn btn-gold" style={{ padding: '10px 18px', fontSize: 13, justifyContent: 'center' }}>
+              
+              {/* Dark/Light mode switcher inside mobile hamburger */}
+              <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: 'color-mix(in srgb, var(--gold) calc(100% * .15), transparent)' }}>
+                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--muted)' }}>
+                  Theme Mode
+                </span>
+                <button 
+                  onClick={toggleTheme}
+                  className="btn btn-ghost text-xs px-3 py-1.5 flex items-center gap-2"
+                >
+                  {theme === 'light' ? (
+                    <><Sun className="w-4 h-4 gold-text" /> Light Mode</>
+                  ) : (
+                    <><Moon className="w-4 h-4 gold-text" /> Dark Mode</>
+                  )}
+                </button>
+              </div>
+
+              <a href="/#converter" onClick={() => setMenuOpen(false)} className="btn btn-gold" style={{ padding: '10px 18px', fontSize: 13, justifyContent: 'center' }}>
                 Convert Free
               </a>
             </div>

@@ -11,7 +11,12 @@ export default function Analytics() {
   useEffect(() => {
     getStats()
       .then(res => {
-        setStats(res.data);
+        if (res.data && typeof res.data === 'object') {
+          setStats({
+            totalConversions: typeof res.data.totalConversions === 'number' ? res.data.totalConversions : 0,
+            byFormat: res.data.byFormat && typeof res.data.byFormat === 'object' ? res.data.byFormat : {}
+          });
+        }
         setLoading(false);
       })
       .catch(err => {
@@ -20,20 +25,22 @@ export default function Analytics() {
       });
   }, []);
 
-  const sortedFormats = Object.entries(stats.byFormat).sort((a, b) => b[1] - a[1]);
+  const safeByFormat = stats?.byFormat && typeof stats.byFormat === 'object' ? stats.byFormat : {};
+  const sortedFormats = Object.entries(safeByFormat).sort((a, b) => b[1] - a[1]);
   
   const categories = { Image: 0, Video: 0, Audio: 0 };
   const IMAGE_FMTS = new Set(['jpg','jpeg','png','webp','avif','tiff','bmp','gif','svg']);
   const VIDEO_FMTS = new Set(['mp4','mov','avi','mkv','webm','flv','mp4_compressed']);
   
-  Object.entries(stats.byFormat).forEach(([fmt, count]) => {
+  Object.entries(safeByFormat).forEach(([fmt, count]) => {
     if (IMAGE_FMTS.has(fmt.toLowerCase())) categories.Image += count;
     else if (VIDEO_FMTS.has(fmt.toLowerCase())) categories.Video += count;
     else categories.Audio += count;
   });
 
-  const estTimeSaved = (stats.totalConversions * 45) / 60; // 45 seconds per file
-  const estDataProcessed = (stats.totalConversions * 15.4) / 1024; // 15.4 MB avg
+  const total = stats?.totalConversions || 0;
+  const estTimeSaved = (total * 45) / 60; // 45 seconds per file
+  const estDataProcessed = (total * 15.4) / 1024; // 15.4 MB avg
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>

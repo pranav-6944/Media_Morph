@@ -41,8 +41,12 @@ const upload = multer({
     limits: { fileSize: 500 * 1024 * 1024 } // 500MB limit per file
 });
 
-router.post('/', upload.array('files', 10), (req, res) => {
-    try {
+router.post('/', (req, res) => {
+    upload.array('files', 50)(req, res, (err) => {
+        if (err) {
+            console.error('Upload Error:', err);
+            return res.status(400).json({ error: err.message || 'Error uploading files' });
+        }
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({ error: 'No files uploaded' });
         }
@@ -56,10 +60,7 @@ router.post('/', upload.array('files', 10), (req, res) => {
         }));
 
         res.json({ message: 'Files uploaded successfully', files: filesData });
-    } catch (error) {
-        console.error('Upload Error:', error);
-        res.status(500).json({ error: 'Server error during file upload' });
-    }
+    });
 });
 
 module.exports = router;
