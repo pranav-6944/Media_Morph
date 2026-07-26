@@ -60,12 +60,20 @@ dirs.forEach(dir => {
     }
 });
 
+// API Routes (with /api and root fallbacks)
 app.use('/api/upload', uploadRoutes);
-app.use('/api/convert', convertRoutes);
-app.use('/api/download', downloadRoutes);
-app.use('/api/stats', statsRoutes);
+app.use('/upload', uploadRoutes);
 
-app.get('/api/health', (req, res) => {
+app.use('/api/convert', convertRoutes);
+app.use('/convert', convertRoutes);
+
+app.use('/api/download', downloadRoutes);
+app.use('/download', downloadRoutes);
+
+app.use('/api/stats', statsRoutes);
+app.use('/stats', statsRoutes);
+
+app.get(['/api/health', '/health'], (req, res) => {
     res.json({ status: 'ok', service: 'mediamorph-backend', timestamp: Date.now() });
 });
 

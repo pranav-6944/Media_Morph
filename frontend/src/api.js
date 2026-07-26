@@ -1,16 +1,21 @@
 import axios from 'axios';
 
 const getApiUrl = () => {
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
-  }
-  if (typeof window !== 'undefined') {
+  let url = import.meta.env.VITE_API_URL;
+  if (!url && typeof window !== 'undefined') {
     const host = window.location.hostname;
     if (host.includes('onrender.com') || (host !== 'localhost' && host !== '127.0.0.1')) {
-      return 'https://mediamorph-backend.onrender.com/api';
+      url = 'https://mediamorph-backend.onrender.com/api';
     }
   }
-  return 'http://localhost:5000/api';
+  if (!url) {
+    url = 'http://localhost:5000/api';
+  }
+  url = url.trim().replace(/\/+$/, '');
+  if (!url.endsWith('/api')) {
+    url = `${url}/api`;
+  }
+  return url;
 };
 
 export const API_URL = getApiUrl();
