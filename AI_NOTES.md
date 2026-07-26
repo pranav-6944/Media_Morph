@@ -66,6 +66,7 @@ Root/
 ## Render Deployment Context
 - `render.yaml`: Multi-service configuration for Render Blueprint (`mediamorph-backend` web service with `runtime: node`, `mediamorph-frontend` web service with `runtime: static`).
 - `unknown type "static"` fix: Render blueprints require `type: web` with `runtime: static` for static sites.
+- `fromService.property` fix: Used `property: host` with `prefix: https://` and `suffix: /api`.
 - `VITE_API_URL`: Points frontend API client to backend URL (`https://<backend-url>/api`)
 - FFmpeg/Sharp: Compatible with Render Linux x64 environment via `@ffmpeg-installer/ffmpeg` & `sharp` prebuilt binaries.
 
