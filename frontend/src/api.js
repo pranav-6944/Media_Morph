@@ -14,12 +14,21 @@ const getApiUrl = () => {
 };
 
 export const API_URL = getApiUrl();
+console.log('[MediaMorph] Connected API_URL:', API_URL);
 
-export const uploadFiles = (formData, onUploadProgress) => {
-  return axios.post(`${API_URL}/upload`, formData, {
+const checkJsonResponse = (res) => {
+  if (typeof res.data === 'string' && (res.data.includes('<!DOCTYPE html>') || res.data.includes('<html'))) {
+    throw new Error(`Backend URL Error: Reached HTML page at ${API_URL}. Ensure backend Web Service "mediamorph-backend" is deployed and running on Render.`);
+  }
+  return res;
+};
+
+export const uploadFiles = async (formData, onUploadProgress) => {
+  const res = await axios.post(`${API_URL}/upload`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress
   });
+  return checkJsonResponse(res);
 };
 
 export const startConversion = (data) => {

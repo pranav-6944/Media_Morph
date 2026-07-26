@@ -64,6 +64,10 @@ app.use('/api/convert', convertRoutes);
 app.use('/api/download', downloadRoutes);
 app.use('/api/stats', statsRoutes);
 
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', service: 'mediamorph-backend', timestamp: Date.now() });
+});
+
 app.get('/', (req, res) => {
     res.send('MediaMorph API is running...');
 });
