@@ -2,19 +2,34 @@ import axios from 'axios';
 
 const getApiUrl = () => {
   let url = import.meta.env.VITE_API_URL;
-  if (!url && typeof window !== 'undefined') {
+
+  // Always prefer explicit onrender.com backend URL when running in browser on render.com
+  if (typeof window !== 'undefined') {
     const host = window.location.hostname;
     if (host.includes('onrender.com') || (host !== 'localhost' && host !== '127.0.0.1')) {
-      url = 'https://mediamorph-backend.onrender.com/api';
+      return 'https://mediamorph-backend.onrender.com/api';
     }
   }
+
   if (!url) {
     url = 'http://localhost:5000/api';
   }
+
   url = url.trim().replace(/\/+$/, '');
+
+  // Handle case where Render sets VITE_API_URL to service name or path without domain
+  if (url === 'mediamorph-backend' || url === 'mediamorph-backend/api') {
+    return 'https://mediamorph-backend.onrender.com/api';
+  }
+
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = `https://${url}`;
+  }
+
   if (!url.endsWith('/api')) {
     url = `${url}/api`;
   }
+
   return url;
 };
 
