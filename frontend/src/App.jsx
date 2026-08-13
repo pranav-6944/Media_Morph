@@ -513,6 +513,16 @@ function Home() {
   const idleCount = files.filter(f => f.status === 'idle').length;
   const doneCount = files.filter(f => f.status === 'completed').length;
 
+  React.useEffect(() => {
+    if (window.location.hash) {
+      const id = window.location.hash.replace('#', '');
+      const elem = document.getElementById(id);
+      if (elem) {
+        setTimeout(() => elem.scrollIntoView({ behavior: 'smooth' }), 150);
+      }
+    }
+  }, []);
+
   /* ────────────────────────────────────────────────────────── */
   return (
     <div className="relative min-h-screen" style={{ background: 'var(--bg)' }}>
