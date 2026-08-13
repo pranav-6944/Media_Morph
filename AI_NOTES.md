@@ -84,6 +84,7 @@ Root/
 - **URL Normalization & Anti-Cache**: `api.js` guarantees `https://` protocol and `/api` suffix regardless of env var formatting (e.g. converting `mediamorph-backend/api` to `https://mediamorph-backend.onrender.com/api`), `server.js` mounts root route aliases (`/upload`, `/convert`), and `index.html` prevents stale browser JS caching.
 - **Default Light Theme**: Light mode (#F5F2EE) set as default first. Dark mode togglable via `data-theme="dark"`.
 - **Hamburger Menu Theme Switcher**: Placed Dark/Light Mode toggle inside `Navbar.jsx` mobile menu.
+- **Mobile Hamburger Section Links**: Updated `Navbar.jsx` & `App.jsx` with `handleNavClick` and `useNavigate` for smooth scrolling to `#features`, `#formats`, and `#how` sections from both Home and `/analytics` routes on mobile and desktop.
 - **Compact Mobile Footer**: Refactored `Footer` links grid into a 2-column list per category on mobile screens, reducing vertical scroll height by ~75% while keeping all 36 links.
 
 ---
